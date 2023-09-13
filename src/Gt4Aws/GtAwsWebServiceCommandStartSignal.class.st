@@ -6,7 +6,7 @@ Class {
 		'retryCount',
 		'executableName'
 	],
-	#category : #Gt4Aws
+	#category : #'Gt4Aws-Logging'
 }
 
 { #category : #accessing }

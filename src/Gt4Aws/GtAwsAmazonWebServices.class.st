@@ -10,7 +10,7 @@ Class {
 	#classInstVars : [
 		'uniqueInstance'
 	],
-	#category : #Gt4Aws
+	#category : #'Gt4Aws-Client'
 }
 
 { #category : #accessing }

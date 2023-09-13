@@ -8,7 +8,7 @@ Class {
 		'modificationTime',
 		'parent'
 	],
-	#category : #Gt4Aws
+	#category : #'Gt4Aws-Model'
 }
 
 { #category : #accessing }

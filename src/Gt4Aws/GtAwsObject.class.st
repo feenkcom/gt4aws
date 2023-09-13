@@ -4,7 +4,7 @@ Class {
 	#instVars : [
 		'jsonObject'
 	],
-	#category : #Gt4Aws
+	#category : #'Gt4Aws-Model'
 }
 
 { #category : #'instance  creation' }

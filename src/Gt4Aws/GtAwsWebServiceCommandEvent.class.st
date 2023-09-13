@@ -1,7 +1,7 @@
 Class {
 	#name : #GtAwsWebServiceCommandEvent,
 	#superclass : #GtBeaconLogEvent,
-	#category : #Gt4Aws
+	#category : #'Gt4Aws-Logging'
 }
 
 { #category : #accessing }

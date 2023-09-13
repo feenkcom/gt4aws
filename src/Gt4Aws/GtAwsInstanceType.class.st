@@ -1,7 +1,7 @@
 Class {
 	#name : #GtAwsInstanceType,
 	#superclass : #GtAwsObject,
-	#category : #Gt4Aws
+	#category : #'Gt4Aws-Model'
 }
 
 { #category : #accessing }
