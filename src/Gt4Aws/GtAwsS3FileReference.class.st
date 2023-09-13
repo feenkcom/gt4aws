@@ -34,7 +34,7 @@ GtAwsS3FileReference >> basenameWithoutExtension [
 GtAwsS3FileReference >> binaryContents [
 	| tmpFile |
 
-	tmpFile := FileReference newTempFilePrefix: 'LwGtS3FileReference-' suffix: '.dat'.
+	tmpFile := FileReference newTempFilePrefix: 'GtAwsS3FileReference-' suffix: '.dat'.
 	^ [ GtAwsAmazonWebServices default s3Cp: self s3Url to: tmpFile asAbsolute fullName.
 		tmpFile gtBinaryContents ]
 			ensure: [ tmpFile ensureDelete ].
@@ -44,7 +44,7 @@ GtAwsS3FileReference >> binaryContents [
 GtAwsS3FileReference >> contents [
 	| tmpFile |
 
-	tmpFile := FileReference newTempFilePrefix: 'LwGtS3FileReference-' suffix: '.dat'.
+	tmpFile := FileReference newTempFilePrefix: 'GtAwsS3FileReference-' suffix: '.dat'.
 	^ [ GtAwsAmazonWebServices default s3Cp: self s3Url to: tmpFile asAbsolute fullName.
 		tmpFile contents ]
 			ensure: [ tmpFile ensureDelete ].

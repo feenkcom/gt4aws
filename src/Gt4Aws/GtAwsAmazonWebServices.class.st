@@ -385,8 +385,6 @@ GtAwsAmazonWebServices >> retryCount: anInteger [
 GtAwsAmazonWebServices >> runArguments: anArray returnBlock: aBlockOrNil [
 	"Run the aws cli with the supplied arguments and process stdout with aBlock"
 	| proc |
-
-	LwGtRunnerStrategy isAwsComputer ifFalse: [ LwGtNotAwsMachineError signal ].
 	
 	proc := GtSubprocessWithInMemoryOutput
 		command: self awsExecutable
@@ -406,8 +404,6 @@ GtAwsAmazonWebServices >> runArguments: anArray returnBlock: aBlockOrNil [
 { #category : #accessing }
 GtAwsAmazonWebServices >> runArguments: anArray returnBlock: aBlockOrNil retryCount: retryNumber [
 	| retriesLeft |
-
-	LwGtRunnerStrategy isAwsComputer ifFalse: [ LwGtNotAwsMachineError signal ].
 
 	retriesLeft := retryNumber.
 	^ [ retriesLeft := retriesLeft - 1.
