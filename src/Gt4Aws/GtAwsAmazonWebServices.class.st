@@ -42,6 +42,47 @@ GtAwsAmazonWebServices class >> uniqueInstance [
 	^ uniqueInstance ifNil: [ uniqueInstance := self new ]
 ]
 
+{ #category : #private }
+GtAwsAmazonWebServices >> autoScalingGroupDescriptionFor: groupName [
+	"Answer the full description of the specified auto-scaling group"
+
+	^ self runArguments: (Array
+				with: 'autoscaling'
+				with: 'describe-auto-scaling-groups'
+				with: '--auto-scaling-group-name'
+				with: groupName)
+		returnBlock: [ :proc | STONJSON fromString: proc stdout ]
+		retryCount: retryCount.
+]
+
+{ #category : #accessing }
+GtAwsAmazonWebServices >> autoScalingGroupRunningCountIn: groupName [
+	"Answer the number of machines currently running in the specified group"
+
+	^ self runArguments: (Array
+				with: 'autoscaling'
+				with: 'describe-auto-scaling-instances'
+				with: '--query'
+				with: 'length(AutoScalingInstances[?AutoScalingGroupName==''', groupName, '''])')
+		returnBlock: [ :proc | proc stdout asIntegerNumber ]
+		retryCount: retryCount.
+]
+
+{ #category : #accessing }
+GtAwsAmazonWebServices >> autoScalingGroupScheduledActionsCountIn: groupName [
+	"Answer the number of machines currently running in the specified group"
+
+	^ self runArguments: (Array
+				with: 'autoscaling'
+				with: 'describe-scheduled-actions'
+				with: '--auto-scaling-group-name'
+				with: groupName
+				with: '--query'
+				with: 'length(ScheduledUpdateGroupActions)')
+		returnBlock: [ :proc | proc stdout asIntegerNumber ]
+		retryCount: retryCount.
+]
+
 { #category : #accessing }
 GtAwsAmazonWebServices >> autoscalingGroup: groupName createOrUpdateTagAt: keyString put: valueString [
 
@@ -105,47 +146,6 @@ GtAwsAmazonWebServices >> autoscalingGroup: groupName setTimelimit: timeoutTime 
 		retryCount: retryCount.
 ]
 
-{ #category : #private }
-GtAwsAmazonWebServices >> autoScalingGroupDescriptionFor: groupName [
-	"Answer the full description of the specified auto-scaling group"
-
-	^ self runArguments: (Array
-				with: 'autoscaling'
-				with: 'describe-auto-scaling-groups'
-				with: '--auto-scaling-group-name'
-				with: groupName)
-		returnBlock: [ :proc | STONJSON fromString: proc stdout ]
-		retryCount: retryCount.
-]
-
-{ #category : #accessing }
-GtAwsAmazonWebServices >> autoScalingGroupRunningCountIn: groupName [
-	"Answer the number of machines currently running in the specified group"
-
-	^ self runArguments: (Array
-				with: 'autoscaling'
-				with: 'describe-auto-scaling-instances'
-				with: '--query'
-				with: 'length(AutoScalingInstances[?AutoScalingGroupName==''', groupName, '''])')
-		returnBlock: [ :proc | proc stdout asIntegerNumber ]
-		retryCount: retryCount.
-]
-
-{ #category : #accessing }
-GtAwsAmazonWebServices >> autoScalingGroupScheduledActionsCountIn: groupName [
-	"Answer the number of machines currently running in the specified group"
-
-	^ self runArguments: (Array
-				with: 'autoscaling'
-				with: 'describe-scheduled-actions'
-				with: '--auto-scaling-group-name'
-				with: groupName
-				with: '--query'
-				with: 'length(ScheduledUpdateGroupActions)')
-		returnBlock: [ :proc | proc stdout asIntegerNumber ]
-		retryCount: retryCount.
-]
-
 { #category : #accessing }
 GtAwsAmazonWebServices >> awsExecutable [
 
@@ -162,6 +162,40 @@ GtAwsAmazonWebServices >> awsRegion [
 GtAwsAmazonWebServices >> awsRegion: aString [
 
 	awsRegion := aString.
+]
+
+{ #category : #accessing }
+GtAwsAmazonWebServices >> cloudformationListResourcesFor: aStackId [
+	| proc |
+	proc := GtSubprocessWithInMemoryOutput
+			command: self awsExecutable
+			arguments: {'cloudformation'.
+					'list-stack-resources'.
+					'--stack-name'.
+					aStackId}.
+	proc
+		retryCount: retryCount;
+		addAllEnvVariablesFromParentWithoutOverride;
+		setDefaultErrorBlock.
+	monitor critical: [ proc runAndWait ].
+	^ ((STONJSON fromString: proc stdout) at: 'StackResourceSummaries')
+		collect: [ :aDict | (S3CloudformationStackResource fromDictionary: aDict) client: self ]
+]
+
+{ #category : #accessing }
+GtAwsAmazonWebServices >> cloudformationListStacks [
+	| proc |
+	proc := GtSubprocessWithInMemoryOutput
+			command: self awsExecutable
+			arguments: {'cloudformation'.
+					'list-stacks'}.
+	proc
+		retryCount: retryCount;
+		addAllEnvVariablesFromParentWithoutOverride;
+		setDefaultErrorBlock.
+	monitor critical: [ proc runAndWait ].
+	^ ((STONJSON fromString: proc stdout) at: 'StackSummaries')
+		collect: [ :aDict | (S3CloudformationStack fromDictionary: aDict) client: self ]
 ]
 
 { #category : #accessing }
@@ -452,6 +486,46 @@ GtAwsAmazonWebServices >> s3DownloadDir: s3DirString to: aFileReference [
 ]
 
 { #category : #accessing }
+GtAwsAmazonWebServices >> s3Ls [
+	| proc |
+	proc := GtSubprocessWithInMemoryOutput
+			command: self awsExecutable
+			arguments: {'s3'.
+					'ls'}.
+	proc
+		retryCount: retryCount;
+		addAllEnvVariablesFromParentWithoutOverride;
+		setDefaultErrorBlock.
+	monitor critical: [ proc runAndWait ].
+	^ proc stdout lines
+		collect: [ :aLine | 
+			| words |
+			words := Character space split: aLine.
+			GtAwsS3Bucket new
+				modifiedAt: (DateAndTime fromString: words first , ' ' , words second);
+				name: words third ]
+]
+
+{ #category : #accessing }
+GtAwsAmazonWebServices >> s3MakeBucket: aString [
+	"Create the specified bucket.
+	aString must be in the format of a s3 URL, i.e. s3://path/to/dir."
+	| proc |
+
+	proc := GtSubprocessWithInMemoryOutput
+		command: self awsExecutable
+		arguments: {
+				's3'.
+				'mb'.
+				aString.
+				}.
+	proc
+		addAllEnvVariablesFromParentWithoutOverride;
+		setDefaultErrorBlock.
+	monitor critical: [ proc runAndWait ].
+]
+
+{ #category : #accessing }
 GtAwsAmazonWebServices >> s3ls: aString [
 	"Answer the contents of the supplied S3 bucket.
 	aString must be in the format of a s3 URL, i.e. s3://path/to/dir.
@@ -491,25 +565,6 @@ GtAwsAmazonWebServices >> s3ls: aString [
 				basename: (directoryRx subexpressions: 2) first;
 				size: 0) ] ] ].
 	^ files.
-]
-
-{ #category : #accessing }
-GtAwsAmazonWebServices >> s3MakeBucket: aString [
-	"Create the specified bucket.
-	aString must be in the format of a s3 URL, i.e. s3://path/to/dir."
-	| proc |
-
-	proc := GtSubprocessWithInMemoryOutput
-		command: self awsExecutable
-		arguments: {
-				's3'.
-				'mb'.
-				aString.
-				}.
-	proc
-		addAllEnvVariablesFromParentWithoutOverride;
-		setDefaultErrorBlock.
-	monitor critical: [ proc runAndWait ].
 ]
 
 { #category : #accessing }

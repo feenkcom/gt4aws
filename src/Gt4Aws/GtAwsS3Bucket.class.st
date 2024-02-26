@@ -1,0 +1,39 @@
+Class {
+	#name : #GtAwsS3Bucket,
+	#superclass : #Object,
+	#instVars : [
+		'modifiedAt',
+		'name'
+	],
+	#category : #'Gt4Aws-Model'
+}
+
+{ #category : #accessing }
+GtAwsS3Bucket >> modifiedAt [
+	^ modifiedAt
+]
+
+{ #category : #accessing }
+GtAwsS3Bucket >> modifiedAt: anObject [
+	modifiedAt := anObject
+]
+
+{ #category : #accessing }
+GtAwsS3Bucket >> name [
+	^ name
+]
+
+{ #category : #accessing }
+GtAwsS3Bucket >> name: anObject [
+	name := anObject
+]
+
+{ #category : #accessing }
+GtAwsS3Bucket >> printOn: aStream [
+	super printOn: aStream.
+
+	aStream
+		nextPut: $(;
+		nextPutAll: self name;
+		nextPut: $)
+]
