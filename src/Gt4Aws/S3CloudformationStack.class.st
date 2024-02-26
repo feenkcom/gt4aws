@@ -83,7 +83,7 @@ S3CloudformationStack >> gtViewResourcesFor: aView [
 	^ aView columnedList
 		title: 'Resources';
 		priority: 1;
-		items: [ self client cloudformationListResourcesFor: self id ];
+		items: [ self client cloudformationListStackResourcesFor: self id ];
 		column: 'Logical Resource ID' text: #logicalResourceId;
 		column: 'Physical Resource ID' text: #physicalResourceId;
 		column: 'Resource Type' text: #resourceType;

@@ -165,7 +165,7 @@ GtAwsAmazonWebServices >> awsRegion: aString [
 ]
 
 { #category : #accessing }
-GtAwsAmazonWebServices >> cloudformationListResourcesFor: aStackId [
+GtAwsAmazonWebServices >> cloudformationListStackResourcesFor: aStackId [
 	| proc |
 	proc := GtSubprocessWithInMemoryOutput
 			command: self awsExecutable
