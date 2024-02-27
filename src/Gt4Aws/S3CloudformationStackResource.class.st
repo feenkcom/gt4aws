@@ -106,3 +106,8 @@ S3CloudformationStackResource >> status [
 S3CloudformationStackResource >> status: anObject [
 	status := anObject
 ]
+
+{ #category : #accessing }
+S3CloudformationStackResource >> statusLabel [
+	^ (GtAwsStatus forName: status) label
+]

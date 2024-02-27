@@ -164,6 +164,13 @@ GtAwsAmazonWebServices >> awsRegion: aString [
 	awsRegion := aString.
 ]
 
+{ #category : #cloudformation }
+GtAwsAmazonWebServices >> cloudformation [
+	"Model and provision all your cloud infrastructure"
+
+	^ GtAwsCloudFormation new client: self
+]
+
 { #category : #accessing }
 GtAwsAmazonWebServices >> cloudformationListStackResourcesFor: aStackId [
 	| proc |
@@ -184,7 +191,7 @@ GtAwsAmazonWebServices >> cloudformationListStackResourcesFor: aStackId [
 
 { #category : #accessing }
 GtAwsAmazonWebServices >> cloudformationListStacks [
-	| proc |
+	| proc aCollection |
 	proc := GtSubprocessWithInMemoryOutput
 			command: self awsExecutable
 			arguments: {'cloudformation'.
@@ -194,8 +201,10 @@ GtAwsAmazonWebServices >> cloudformationListStacks [
 		addAllEnvVariablesFromParentWithoutOverride;
 		setDefaultErrorBlock.
 	monitor critical: [ proc runAndWait ].
-	^ ((STONJSON fromString: proc stdout) at: 'StackSummaries')
-		collect: [ :aDict | (S3CloudformationStack fromDictionary: aDict) client: self ]
+	aCollection := ((STONJSON fromString: proc stdout) at: 'StackSummaries')
+			collect: [ :aDict | (S3CloudformationStack fromDictionary: aDict) client: self ].
+
+	^ S3CloudformationStackGroup withAll: aCollection
 ]
 
 { #category : #accessing }
@@ -327,6 +336,25 @@ GtAwsAmazonWebServices >> getParameterNamed: nameString [
 	monitor critical: [ proc runAndWait ].
 	^ proc stdout trimAll.
 
+]
+
+{ #category : #'gt - extensions' }
+GtAwsAmazonWebServices >> gtNavigationFor: aView [
+	<gtView>
+	^ aView columnedList
+		title: 'Navigation';
+		priority: 1;
+		items: [ self gtNavigations associations ];
+		column: 'Name' text: #key;
+		column: 'Value' text: #value;
+		send: #value
+]
+
+{ #category : #'gt - extensions' }
+GtAwsAmazonWebServices >> gtNavigations [
+	^ OrderedDictionary new
+		at: 'CloudFormation' put: self cloudformation;
+		yourself
 ]
 
 { #category : #accessing }

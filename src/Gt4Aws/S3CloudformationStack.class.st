@@ -87,7 +87,7 @@ S3CloudformationStack >> gtViewResourcesFor: aView [
 		column: 'Logical Resource ID' text: #logicalResourceId;
 		column: 'Physical Resource ID' text: #physicalResourceId;
 		column: 'Resource Type' text: #resourceType;
-		column: 'Status' text: #status
+		column: 'Status' text: #statusLabel
 ]
 
 { #category : #accessing }
@@ -138,6 +138,11 @@ S3CloudformationStack >> status [
 { #category : #accessing }
 S3CloudformationStack >> status: anObject [
 	status := anObject
+]
+
+{ #category : #accessing }
+S3CloudformationStack >> statusLabel [
+	^ (GtAwsStatus forName: status) label
 ]
 
 { #category : #accessing }
