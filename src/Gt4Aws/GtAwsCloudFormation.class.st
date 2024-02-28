@@ -23,6 +23,18 @@ GtAwsCloudFormation >> gtDisplayOn: stream [
 	stream nextPutAll: 'AWS CloudFormation'
 ]
 
+{ #category : #accessing }
+GtAwsCloudFormation >> gtSearchStacksFor: aSearch [
+	<gtSearch>
+		^ aSearch list
+		title: 'Stacks';
+		priority: 30;
+		items: [ self stacks ];
+		itemsLimit: Float infinity;
+		itemName: #name;
+		filterBySubstring
+]
+
 { #category : #'gt - extensions' }
 GtAwsCloudFormation >> gtStacksFor: aView [
 	<gtView>
@@ -36,6 +48,6 @@ GtAwsCloudFormation >> gtStacksFor: aView [
 
 { #category : #requests }
 GtAwsCloudFormation >> stacks [
-	<return: #Collection of: #S3CloudformationStack>
+	<return: #S3CloudformationStackGroup>
 	^ client cloudformationListStacks
 ]
