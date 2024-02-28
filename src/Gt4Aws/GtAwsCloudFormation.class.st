@@ -27,13 +27,11 @@ GtAwsCloudFormation >> gtDisplayOn: stream [
 GtAwsCloudFormation >> gtStacksFor: aView [
 	<gtView>
 	client ifNil: [ ^ aView empty ].
-	^ aView columnedList
+	^ aView forward
 		title: 'Stacks';
 		priority: 1;
-		items: [ self stacks ];
-		column: 'Stack name' text: #name;
-		column: 'Description' text: [ :each | each templateDescription ifNil: [ '' ] ];
-		column: 'Status' text: #statusLabel
+		object: [ self stacks ];
+		view: #gtStacksFor:
 ]
 
 { #category : #requests }
