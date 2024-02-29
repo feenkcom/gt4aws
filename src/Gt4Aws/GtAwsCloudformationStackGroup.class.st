@@ -1,11 +1,11 @@
 Class {
-	#name : #S3CloudformationStackGroup,
+	#name : #GtAwsCloudformationStackGroup,
 	#superclass : #GtAwsGroup,
 	#category : #'Gt4Aws-Model'
 }
 
 { #category : #accessing }
-S3CloudformationStackGroup >> gtStacksFor: aView [
+GtAwsCloudformationStackGroup >> gtStacksFor: aView [
 	<gtView>
 	^ aView columnedList
 		title: 'Stacks';

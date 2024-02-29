@@ -1,11 +1,11 @@
 Class {
-	#name : #S3CloudFormationStackResourceGroup,
+	#name : #GtAwsCloudFormationStackResourceGroup,
 	#superclass : #GtAwsGroup,
 	#category : #'Gt4Aws-Model'
 }
 
 { #category : #accessing }
-S3CloudFormationStackResourceGroup >> gtResourcesFor: aView [
+GtAwsCloudFormationStackResourceGroup >> gtResourcesFor: aView [
 	<gtView>
 	^ aView columnedList
 		title: 'Resources';

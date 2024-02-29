@@ -2,15 +2,49 @@ Class {
 	#name : #GtAwsObject,
 	#superclass : #Object,
 	#instVars : [
-		'jsonObject'
+		'jsonObject',
+		'client'
 	],
 	#category : #'Gt4Aws-Model'
 }
+
+{ #category : #accessing }
+GtAwsObject class >> forResourceType: aResourceType [
+	self
+		subclassesDo: [ :aClass | aClass resourceType = aResourceType ifTrue: [ ^ aClass ] ].
+
+	^ self error: 'Object for AWS resource type ' , aResourceType , ' not found'
+]
 
 { #category : #'instance  creation' }
 GtAwsObject class >> jsonObject: aJsonObject [
 
 	^ self new jsonObject: aJsonObject
+]
+
+{ #category : #accessing }
+GtAwsObject class >> lookup: anId inClient: aClient [
+	^ aClient perform: self lookupEndpoint withArguments: {anId}
+]
+
+{ #category : #accessing }
+GtAwsObject class >> lookupEndpoint [
+	^ self subclassResponsibility
+]
+
+{ #category : #accessing }
+GtAwsObject class >> resourceType [
+	^ ''
+]
+
+{ #category : #accessing }
+GtAwsObject >> client [
+	^ client
+]
+
+{ #category : #accessing }
+GtAwsObject >> client: anObject [
+	client := anObject
 ]
 
 { #category : #accessing }

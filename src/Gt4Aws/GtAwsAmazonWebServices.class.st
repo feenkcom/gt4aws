@@ -185,9 +185,9 @@ GtAwsAmazonWebServices >> cloudformationListStackResourcesFor: aStackId [
 		addAllEnvVariablesFromParentWithoutOverride;
 		setDefaultErrorBlock.
 	monitor critical: [ proc runAndWait ].
-	^ S3CloudFormationStackResourceGroup
+	^ GtAwsCloudFormationStackResourceGroup
 		withAll: (((STONJSON fromString: proc stdout) at: 'StackResourceSummaries')
-				collect: [ :aDict | (S3CloudformationStackResource fromDictionary: aDict) client: self ])
+				collect: [ :aDict | (GtAwsCloudformationStackResource fromDictionary: aDict) client: self ])
 ]
 
 { #category : #accessing }
@@ -203,9 +203,9 @@ GtAwsAmazonWebServices >> cloudformationListStacks [
 		setDefaultErrorBlock.
 	monitor critical: [ proc runAndWait ].
 	aCollection := ((STONJSON fromString: proc stdout) at: 'StackSummaries')
-			collect: [ :aDict | (S3CloudformationStack fromDictionary: aDict) client: self ].
+			collect: [ :aDict | (GtAwsCloudformationStack fromDictionary: aDict) client: self ].
 
-	^ S3CloudformationStackGroup withAll: aCollection
+	^ GtAwsCloudformationStackGroup withAll: aCollection
 ]
 
 { #category : #accessing }
@@ -648,4 +648,27 @@ GtAwsAmazonWebServices >> setSecretAccessKey: aString [
 		addAllEnvVariablesFromParentWithoutOverride;
 		setDefaultErrorBlock.
 	monitor critical: [ proc runAndWait ].
+]
+
+{ #category : #accessing }
+GtAwsAmazonWebServices >> sqsGetQueueAttributes: aQueueId [
+	| proc |
+	proc := GtSubprocessWithInMemoryOutput
+			command: self awsExecutable
+			arguments: {'sqs'.
+					'get-queue-attributes'.
+					'--queue-url'.
+					aQueueId.
+					'--attribute-names'.
+					'All'}.
+	proc
+		retryCount: retryCount;
+		addAllEnvVariablesFromParentWithoutOverride;
+		setDefaultErrorBlock.
+	monitor critical: [ proc runAndWait ].
+
+	^ GtAwsSQSQueue new
+		client: self;
+		url: aQueueId;
+		attributes: ((STONJSON fromString: proc stdout) at: 'Attributes')
 ]

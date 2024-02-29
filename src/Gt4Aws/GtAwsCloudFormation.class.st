@@ -77,7 +77,7 @@ GtAwsCloudFormation >> refreshStacks [
 
 { #category : #requests }
 GtAwsCloudFormation >> stacks [
-	<return: #S3CloudformationStackGroup>
+	<return: #GtAwsCloudformationStackGroup>
 	^ stacks ifNil: [ self refreshStacks ]
 ]
 

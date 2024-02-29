@@ -1,6 +1,6 @@
 Class {
-	#name : #S3CloudformationStack,
-	#superclass : #Object,
+	#name : #GtAwsCloudformationStack,
+	#superclass : #GtAwsObject,
 	#instVars : [
 		'id',
 		'status',
@@ -10,14 +10,13 @@ Class {
 		'deleted',
 		'templateDescription',
 		'driftInformation',
-		'client',
 		'resources'
 	],
 	#category : #'Gt4Aws-Model'
 }
 
 { #category : #accessing }
-S3CloudformationStack class >> fromDictionary: aDict [
+GtAwsCloudformationStack class >> fromDictionary: aDict [
 	^ self new
 		id: (aDict at: 'StackId');
 		status: (aDict at: 'StackStatus');
@@ -39,52 +38,42 @@ S3CloudformationStack class >> fromDictionary: aDict [
 ]
 
 { #category : #accessing }
-S3CloudformationStack class >> gtGroupType [
-	^ S3CloudformationStackGroup
+GtAwsCloudformationStack class >> gtGroupType [
+	^ GtAwsCloudformationStackGroup
 ]
 
 { #category : #accessing }
-S3CloudformationStack >> client [
-	^ client
-]
-
-{ #category : #accessing }
-S3CloudformationStack >> client: anObject [
-	client := anObject
-]
-
-{ #category : #accessing }
-S3CloudformationStack >> created [
+GtAwsCloudformationStack >> created [
 	^ created
 ]
 
 { #category : #accessing }
-S3CloudformationStack >> created: anObject [
+GtAwsCloudformationStack >> created: anObject [
 	created := anObject
 ]
 
 { #category : #accessing }
-S3CloudformationStack >> deleted [
+GtAwsCloudformationStack >> deleted [
 	^ deleted
 ]
 
 { #category : #accessing }
-S3CloudformationStack >> deleted: anObject [
+GtAwsCloudformationStack >> deleted: anObject [
 	deleted := anObject
 ]
 
 { #category : #accessing }
-S3CloudformationStack >> driftInformation [
+GtAwsCloudformationStack >> driftInformation [
 	^ driftInformation
 ]
 
 { #category : #accessing }
-S3CloudformationStack >> driftInformation: anObject [
+GtAwsCloudformationStack >> driftInformation: anObject [
 	driftInformation := anObject
 ]
 
 { #category : #accessing }
-S3CloudformationStack >> gtRefreshResourcesFor: anAction [
+GtAwsCloudformationStack >> gtRefreshResourcesFor: anAction [
 	<gtAction>
 	^ anAction button
 		icon: BrGlamorousVectorIcons refresh;
@@ -94,7 +83,7 @@ S3CloudformationStack >> gtRefreshResourcesFor: anAction [
 ]
 
 { #category : #accessing }
-S3CloudformationStack >> gtSearchResourcesFor: aSearch [
+GtAwsCloudformationStack >> gtSearchResourcesFor: aSearch [
 	<gtSearch>
 		^ aSearch list
 		title: 'Resources';
@@ -106,7 +95,7 @@ S3CloudformationStack >> gtSearchResourcesFor: aSearch [
 ]
 
 { #category : #accessing }
-S3CloudformationStack >> gtViewResourcesByStatusFor: aView [
+GtAwsCloudformationStack >> gtViewResourcesByStatusFor: aView [
 	<gtView>
 	^ aView columnedList
 		title: 'Resources by status';
@@ -118,7 +107,7 @@ S3CloudformationStack >> gtViewResourcesByStatusFor: aView [
 ]
 
 { #category : #accessing }
-S3CloudformationStack >> gtViewResourcesFor: aView [
+GtAwsCloudformationStack >> gtViewResourcesFor: aView [
 	<gtView>
 	^ aView forward
 		title: 'Resources';
@@ -128,37 +117,37 @@ S3CloudformationStack >> gtViewResourcesFor: aView [
 ]
 
 { #category : #accessing }
-S3CloudformationStack >> id [
+GtAwsCloudformationStack >> id [
 	^ id
 ]
 
 { #category : #accessing }
-S3CloudformationStack >> id: anObject [
+GtAwsCloudformationStack >> id: anObject [
 	id := anObject
 ]
 
 { #category : #accessing }
-S3CloudformationStack >> lastUpdated [
+GtAwsCloudformationStack >> lastUpdated [
 	^ lastUpdated
 ]
 
 { #category : #accessing }
-S3CloudformationStack >> lastUpdated: anObject [
+GtAwsCloudformationStack >> lastUpdated: anObject [
 	lastUpdated := anObject
 ]
 
 { #category : #accessing }
-S3CloudformationStack >> name [
+GtAwsCloudformationStack >> name [
 	^ name
 ]
 
 { #category : #accessing }
-S3CloudformationStack >> name: anObject [
+GtAwsCloudformationStack >> name: anObject [
 	name := anObject
 ]
 
 { #category : #accessing }
-S3CloudformationStack >> printOn: aStream [
+GtAwsCloudformationStack >> printOn: aStream [
 	super printOn: aStream.
 
 	aStream
@@ -168,41 +157,41 @@ S3CloudformationStack >> printOn: aStream [
 ]
 
 { #category : #accessing }
-S3CloudformationStack >> refreshResources [
+GtAwsCloudformationStack >> refreshResources [
 	^ resources := self client cloudformationListStackResourcesFor: self id
 ]
 
 { #category : #accessing }
-S3CloudformationStack >> resources [
+GtAwsCloudformationStack >> resources [
 	^ resources ifNil: [ self refreshResources ]
 ]
 
 { #category : #accessing }
-S3CloudformationStack >> resourcesByStacks [
+GtAwsCloudformationStack >> resourcesByStacks [
 	^ self resources groupedBy: #status
 ]
 
 { #category : #accessing }
-S3CloudformationStack >> status [
+GtAwsCloudformationStack >> status [
 	^ status
 ]
 
 { #category : #accessing }
-S3CloudformationStack >> status: anObject [
+GtAwsCloudformationStack >> status: anObject [
 	status := anObject
 ]
 
 { #category : #accessing }
-S3CloudformationStack >> statusLabel [
+GtAwsCloudformationStack >> statusLabel [
 	^ (GtAwsStatus forName: status) label
 ]
 
 { #category : #accessing }
-S3CloudformationStack >> templateDescription [
+GtAwsCloudformationStack >> templateDescription [
 	^ templateDescription
 ]
 
 { #category : #accessing }
-S3CloudformationStack >> templateDescription: anObject [
+GtAwsCloudformationStack >> templateDescription: anObject [
 	templateDescription := anObject
 ]
