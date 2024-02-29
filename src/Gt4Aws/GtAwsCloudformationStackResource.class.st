@@ -44,11 +44,18 @@ GtAwsCloudformationStackResource >> driftInformation: anObject [
 { #category : #accessing }
 GtAwsCloudformationStackResource >> gtInspectResourceFor: anAction [
 	<gtAction>
+	self hasResourceClass ifFalse: [ ^ anAction noAction ].
+
 	^ anAction button
 		icon: BrGlamorousVectorIcons playinspect;
 		tooltip: 'Inspect Resource';
 		priority: 5;
 		action: [ :aButton | aButton phlow spawnObject: self resourceObject ]
+]
+
+{ #category : #accessing }
+GtAwsCloudformationStackResource >> hasResourceClass [
+	^ (GtAwsObject forResourceType: self resourceType ifNotFound: [ nil ]) isNotNil
 ]
 
 { #category : #accessing }

@@ -388,6 +388,26 @@ GtAwsAmazonWebServices >> instanceTypes [
 ]
 
 { #category : #accessing }
+GtAwsAmazonWebServices >> lambdaGetFunction: anId [
+	| proc |
+	proc := GtSubprocessWithInMemoryOutput
+			command: self awsExecutable
+			arguments: {'lambda'.
+					'get-function'.
+					'--function-name'.
+					anId}.
+	proc
+		retryCount: retryCount;
+		addAllEnvVariablesFromParentWithoutOverride;
+		setDefaultErrorBlock.
+	monitor critical: [ proc runAndWait ].
+
+	^ GtAwsLambdaFunction new
+		client: self;
+		jsonObject: (STONJSON fromString: proc stdout)
+]
+
+{ #category : #accessing }
 GtAwsAmazonWebServices >> primEc2Command: operation instanceId: aString [
 	| proc |
 
@@ -432,6 +452,26 @@ GtAwsAmazonWebServices >> putParameterNamed: nameString value: valueString [
 	monitor critical: [ proc runAndWait ].
 	^ proc stdout trimAll.
 
+]
+
+{ #category : #accessing }
+GtAwsAmazonWebServices >> rdsDescribeInstance: anId [
+	| proc |
+	proc := GtSubprocessWithInMemoryOutput
+			command: self awsExecutable
+			arguments: {'rds'.
+					'describe-db-instances'.
+					'--db-instance-identifier'.
+					anId}.
+	proc
+		retryCount: retryCount;
+		addAllEnvVariablesFromParentWithoutOverride;
+		setDefaultErrorBlock.
+	monitor critical: [ proc runAndWait ].
+
+	^ GtAwsRDSInstance new
+		client: self;
+		jsonObject: (STONJSON fromString: proc stdout)
 ]
 
 { #category : #accessing }

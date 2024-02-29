@@ -10,10 +10,17 @@ Class {
 
 { #category : #accessing }
 GtAwsObject class >> forResourceType: aResourceType [
+	^ self
+		forResourceType: aResourceType
+		ifNotFound: [ self error: 'Object for AWS resource type ' , aResourceType , ' not found' ]
+]
+
+{ #category : #accessing }
+GtAwsObject class >> forResourceType: aResourceType ifNotFound: aBlock [
 	self
 		subclassesDo: [ :aClass | aClass resourceType = aResourceType ifTrue: [ ^ aClass ] ].
 
-	^ self error: 'Object for AWS resource type ' , aResourceType , ' not found'
+	^ aBlock value
 ]
 
 { #category : #'instance  creation' }

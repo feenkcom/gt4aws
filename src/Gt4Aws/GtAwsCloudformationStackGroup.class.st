@@ -5,6 +5,16 @@ Class {
 }
 
 { #category : #accessing }
+GtAwsCloudformationStackGroup >> gtResourcesFor: aView [
+	<gtView>
+	^ aView forward
+		title: 'Resources';
+		priority: 2;
+		object: [ self resources ];
+		view: #gtResourcesFor:
+]
+
+{ #category : #accessing }
 GtAwsCloudformationStackGroup >> gtStacksFor: aView [
 	<gtView>
 	^ aView columnedList
@@ -19,5 +29,5 @@ GtAwsCloudformationStackGroup >> gtStacksFor: aView [
 { #category : #accessing }
 GtAwsCloudformationStackGroup >> resources [
 	^ GtAwsCloudFormationStackResourceGroup
-		withAll: (self items flatCollect: #resources)
+		withAll: (self items flatCollect: [ :aStack | [ aStack resources ] on: Error do: [ {} ] ])
 ]
