@@ -24,6 +24,30 @@ GtAwsCloudFormation >> gtDisplayOn: stream [
 	stream nextPutAll: 'AWS CloudFormation'
 ]
 
+{ #category : #'gt - extensions' }
+GtAwsCloudFormation >> gtLatestStacksByStatusFor: aView [
+	<gtView>
+	client ifNil: [ ^ aView empty ].
+	^ aView columnedList
+		title: 'Latest stacks by status';
+		priority: 3;
+		items: [ self latestStacksByStatus associations ];
+		column: 'Status' text: #key;
+		column: '# of stacks' text: [:aPair | aPair value size ];
+		send: #value
+]
+
+{ #category : #'gt - extensions' }
+GtAwsCloudFormation >> gtLatestStacksFor: aView [
+	<gtView>
+	client ifNil: [ ^ aView empty ].
+	^ aView forward
+		title: 'Latest stacks';
+		priority: 3;
+		object: [ self latestStacks ];
+		view: #gtStacksFor:
+]
+
 { #category : #accessing }
 GtAwsCloudFormation >> gtRefreshStacksFor: anAction [
 	<gtAction>
@@ -68,6 +92,18 @@ GtAwsCloudFormation >> gtStacksFor: aView [
 		priority: 1;
 		object: [ self stacks ];
 		view: #gtStacksFor:
+]
+
+{ #category : #'gt - extensions' }
+GtAwsCloudFormation >> latestStacks [
+	^ GtAwsCloudformationStackGroup
+		withAll: ((self stacks groupedBy: #name) values
+				collect: [ :aList | aList detectMax: #lastTouched ])
+]
+
+{ #category : #'gt - extensions' }
+GtAwsCloudFormation >> latestStacksByStatus [
+	^ self latestStacks groupedBy: #status
 ]
 
 { #category : #requests }

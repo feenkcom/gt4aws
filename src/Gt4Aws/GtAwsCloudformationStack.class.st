@@ -127,6 +127,17 @@ GtAwsCloudformationStack >> id: anObject [
 ]
 
 { #category : #accessing }
+GtAwsCloudformationStack >> lastTouched [
+	| lastTouched |
+	lastTouched := created.
+	
+	lastUpdated ifNotNil: [ lastTouched := lastTouched max: lastUpdated ].
+	deleted ifNotNil: [ lastTouched := lastTouched max: deleted ].
+
+	^ lastTouched
+]
+
+{ #category : #accessing }
 GtAwsCloudformationStack >> lastUpdated [
 	^ lastUpdated
 ]

@@ -15,3 +15,9 @@ GtAwsCloudformationStackGroup >> gtStacksFor: aView [
 		column: 'Description' text: [ :each | each templateDescription ifNil: [ '' ] ];
 		column: 'Status' text: #statusLabel
 ]
+
+{ #category : #accessing }
+GtAwsCloudformationStackGroup >> resources [
+	^ GtAwsCloudFormationStackResourceGroup
+		withAll: (self items flatCollect: #resources)
+]
