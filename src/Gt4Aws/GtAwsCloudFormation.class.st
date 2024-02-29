@@ -2,7 +2,8 @@ Class {
 	#name : #GtAwsCloudFormation,
 	#superclass : #Object,
 	#instVars : [
-		'client'
+		'client',
+		'stacks'
 	],
 	#category : #'Gt4Aws-Modelel'
 }
@@ -24,6 +25,16 @@ GtAwsCloudFormation >> gtDisplayOn: stream [
 ]
 
 { #category : #accessing }
+GtAwsCloudFormation >> gtRefreshStacksFor: anAction [
+	<gtAction>
+	^ anAction button
+		icon: BrGlamorousVectorIcons refresh;
+		tooltip: 'Refresh stacks';
+		priority: 3;
+		action: [ self refreshStacks ]
+]
+
+{ #category : #accessing }
 GtAwsCloudFormation >> gtSearchStacksFor: aSearch [
 	<gtSearch>
 		^ aSearch list
@@ -33,6 +44,19 @@ GtAwsCloudFormation >> gtSearchStacksFor: aSearch [
 		itemsLimit: Float infinity;
 		itemName: #name;
 		filterBySubstring
+]
+
+{ #category : #'gt - extensions' }
+GtAwsCloudFormation >> gtStacksByStatusFor: aView [
+	<gtView>
+	client ifNil: [ ^ aView empty ].
+	^ aView columnedList
+		title: 'Stacks by status';
+		priority: 2;
+		items: [ self stacksByStatus associations ];
+		column: 'Status' text: #key;
+		column: '# of stacks' text: [:aPair | aPair value size ];
+		send: #value
 ]
 
 { #category : #'gt - extensions' }
@@ -47,7 +71,17 @@ GtAwsCloudFormation >> gtStacksFor: aView [
 ]
 
 { #category : #requests }
+GtAwsCloudFormation >> refreshStacks [
+	^ stacks := client cloudformationListStacks
+]
+
+{ #category : #requests }
 GtAwsCloudFormation >> stacks [
 	<return: #S3CloudformationStackGroup>
-	^ client cloudformationListStacks
+	^ stacks ifNil: [ self refreshStacks ]
+]
+
+{ #category : #'gt - extensions' }
+GtAwsCloudFormation >> stacksByStatus [
+	^ self stacks groupedBy: #status
 ]

@@ -38,6 +38,11 @@ S3CloudformationStack class >> fromDictionary: aDict [
 ]
 
 { #category : #accessing }
+S3CloudformationStack class >> gtGroupType [
+	^ S3CloudformationStackGroup
+]
+
+{ #category : #accessing }
 S3CloudformationStack >> client [
 	^ client
 ]
