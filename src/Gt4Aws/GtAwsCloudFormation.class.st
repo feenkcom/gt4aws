@@ -5,7 +5,7 @@ Class {
 		'client',
 		'stacks'
 	],
-	#category : #'Gt4Aws-Modelel'
+	#category : #'Gt4Aws-Model'
 }
 
 { #category : #accessing }

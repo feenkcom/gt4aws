@@ -185,8 +185,9 @@ GtAwsAmazonWebServices >> cloudformationListStackResourcesFor: aStackId [
 		addAllEnvVariablesFromParentWithoutOverride;
 		setDefaultErrorBlock.
 	monitor critical: [ proc runAndWait ].
-	^ ((STONJSON fromString: proc stdout) at: 'StackResourceSummaries')
-		collect: [ :aDict | (S3CloudformationStackResource fromDictionary: aDict) client: self ]
+	^ S3CloudFormationStackResourceGroup
+		withAll: (((STONJSON fromString: proc stdout) at: 'StackResourceSummaries')
+				collect: [ :aDict | (S3CloudformationStackResource fromDictionary: aDict) client: self ])
 ]
 
 { #category : #accessing }
