@@ -506,7 +506,7 @@ GtAwsAmazonWebServices >> rdsDescribeInstance: anId [
 
 { #category : #accessing }
 GtAwsAmazonWebServices >> rdsDescribeInstances [
-	| proc |
+	| proc aCollection |
 	proc := GtSubprocessWithInMemoryOutput
 			command: self awsExecutable
 			arguments: {'rds'.
@@ -517,11 +517,13 @@ GtAwsAmazonWebServices >> rdsDescribeInstances [
 		setDefaultErrorBlock.
 	monitor critical: [ proc runAndWait ].
 
-	^ ((STONJSON fromString: proc stdout) at: 'DBInstances')
+	aCollection := ((STONJSON fromString: proc stdout) at: 'DBInstances')
 		collect: [ :anInstance | 
 			GtAwsRDSInstance new
 				client: self;
-				jsonObject: (STONJSON fromString: proc stdout) ]
+				jsonObject: (STONJSON fromString: proc stdout) ].
+				
+	^ GtAwsRDSInstanceGroup withAll: aCollection
 ]
 
 { #category : #accessing }
