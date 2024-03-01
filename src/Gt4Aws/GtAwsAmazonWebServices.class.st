@@ -355,6 +355,7 @@ GtAwsAmazonWebServices >> gtNavigationFor: aView [
 GtAwsAmazonWebServices >> gtNavigations [
 	^ OrderedDictionary new
 		at: 'CloudFormation' put: self cloudformation;
+		at: 'Lambda' put: self lambda;
 		yourself
 ]
 
@@ -387,6 +388,12 @@ GtAwsAmazonWebServices >> instanceTypes [
 		retryCount: retryCount
 ]
 
+{ #category : #'gt - extensions' }
+GtAwsAmazonWebServices >> lambda [
+
+	^ GtAwsLambda new client: self
+]
+
 { #category : #accessing }
 GtAwsAmazonWebServices >> lambdaGetFunction: anId [
 	| proc |
@@ -402,9 +409,27 @@ GtAwsAmazonWebServices >> lambdaGetFunction: anId [
 		setDefaultErrorBlock.
 	monitor critical: [ proc runAndWait ].
 
-	^ GtAwsLambdaFunction new
-		client: self;
-		jsonObject: (STONJSON fromString: proc stdout)
+	^ (GtAwsLambdaFunction fromDictionary: (STONJSON fromString: proc stdout))
+		client: self
+]
+
+{ #category : #accessing }
+GtAwsAmazonWebServices >> lambdaListFunctions [
+	| proc aCollection |
+	proc := GtSubprocessWithInMemoryOutput
+			command: self awsExecutable
+			arguments: {'lambda'.
+					'list-functions'}.
+	proc
+		retryCount: retryCount;
+		addAllEnvVariablesFromParentWithoutOverride;
+		setDefaultErrorBlock.
+	monitor critical: [ proc runAndWait ].
+
+	aCollection := ((STONJSON fromString: proc stdout) at: 'Functions')
+			collect: [ :aDict | (GtAwsLambdaFunction fromDictionary: aDict) client: self ].
+
+	^ GtAwsLambdaFunctionGroup withAll: aCollection
 ]
 
 { #category : #accessing }

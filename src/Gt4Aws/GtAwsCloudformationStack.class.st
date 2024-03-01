@@ -18,6 +18,7 @@ Class {
 { #category : #accessing }
 GtAwsCloudformationStack class >> fromDictionary: aDict [
 	^ self new
+		jsonObject: aDict;
 		id: (aDict at: 'StackId');
 		status: (aDict at: 'StackStatus');
 		name: (aDict at: 'StackName');

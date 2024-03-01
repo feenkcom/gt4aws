@@ -15,6 +15,7 @@ Class {
 { #category : #accessing }
 GtAwsCloudformationStackResource class >> fromDictionary: aDict [
 	^ self new
+		jsonObject: aDict;
 		logicalResourceId: (aDict at: 'LogicalResourceId');
 		physicalResourceId: (aDict at: 'PhysicalResourceId');
 		status: (aDict at: 'ResourceStatus');
