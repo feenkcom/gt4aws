@@ -357,6 +357,7 @@ GtAwsAmazonWebServices >> gtNavigations [
 		at: 'CloudFormation' put: self cloudformation;
 		at: 'Lambda' put: self lambda;
 		at: 'RDS' put: self rds;
+		at: 'S3' put: self s3;
 		yourself
 ]
 
@@ -569,6 +570,11 @@ GtAwsAmazonWebServices >> runArguments: anArray returnBlock: aBlockOrNil retryCo
 				ifFalse: [ ex pass ] ].
 ]
 
+{ #category : #'gt - extensions' }
+GtAwsAmazonWebServices >> s3 [
+	^ GtAwsS3 new client: self
+]
+
 { #category : #accessing }
 GtAwsAmazonWebServices >> s3Cp: srcString to: dstString [
 	"Copy srcString to dstString.
@@ -618,13 +624,14 @@ GtAwsAmazonWebServices >> s3Ls [
 		addAllEnvVariablesFromParentWithoutOverride;
 		setDefaultErrorBlock.
 	monitor critical: [ proc runAndWait ].
-	^ proc stdout lines
-		collect: [ :aLine | 
-			| words |
-			words := Character space split: aLine.
-			GtAwsS3Bucket new
-				modifiedAt: (DateAndTime fromString: words first , ' ' , words second);
-				name: words third ]
+	^ GtAwsS3BucketGroup
+		withAll: (proc stdout lines
+				collect: [ :aLine | 
+					| words |
+					words := Character space split: aLine.
+					GtAwsS3Bucket new
+						modifiedAt: (DateAndTime fromString: words first , ' ' , words second);
+						name: words third ])
 ]
 
 { #category : #accessing }
