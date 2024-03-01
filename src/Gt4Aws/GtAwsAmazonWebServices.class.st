@@ -356,6 +356,7 @@ GtAwsAmazonWebServices >> gtNavigations [
 	^ OrderedDictionary new
 		at: 'CloudFormation' put: self cloudformation;
 		at: 'Lambda' put: self lambda;
+		at: 'RDS' put: self rds;
 		yourself
 ]
 
@@ -390,7 +391,6 @@ GtAwsAmazonWebServices >> instanceTypes [
 
 { #category : #'gt - extensions' }
 GtAwsAmazonWebServices >> lambda [
-
 	^ GtAwsLambda new client: self
 ]
 
@@ -479,6 +479,11 @@ GtAwsAmazonWebServices >> putParameterNamed: nameString value: valueString [
 
 ]
 
+{ #category : #'gt - extensions' }
+GtAwsAmazonWebServices >> rds [
+	^ GtAwsRds new client: self
+]
+
 { #category : #accessing }
 GtAwsAmazonWebServices >> rdsDescribeInstance: anId [
 	| proc |
@@ -497,6 +502,26 @@ GtAwsAmazonWebServices >> rdsDescribeInstance: anId [
 	^ GtAwsRDSInstance new
 		client: self;
 		jsonObject: (STONJSON fromString: proc stdout)
+]
+
+{ #category : #accessing }
+GtAwsAmazonWebServices >> rdsDescribeInstances [
+	| proc |
+	proc := GtSubprocessWithInMemoryOutput
+			command: self awsExecutable
+			arguments: {'rds'.
+					'describe-db-instances'}.
+	proc
+		retryCount: retryCount;
+		addAllEnvVariablesFromParentWithoutOverride;
+		setDefaultErrorBlock.
+	monitor critical: [ proc runAndWait ].
+
+	^ ((STONJSON fromString: proc stdout) at: 'DBInstances')
+		collect: [ :anInstance | 
+			GtAwsRDSInstance new
+				client: self;
+				jsonObject: (STONJSON fromString: proc stdout) ]
 ]
 
 { #category : #accessing }
