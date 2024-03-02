@@ -55,6 +55,16 @@ GtAwsObject >> client: anObject [
 ]
 
 { #category : #accessing }
+GtAwsObject >> gtLookupInCloudFormationActionFor: anAction [
+	<gtAction>
+	^ anAction button
+		priority: 5;
+		icon: BrGlamorousVectorIcons playinspect;
+		tooltip: 'Lookup in CloudFormation';
+		action: [ :aButton | aButton phlow spawnObject: self lookupInCloudFormation ]
+]
+
+{ #category : #accessing }
 GtAwsObject >> gtRawInfoFor: aView [
 	<gtView>
 
@@ -77,4 +87,9 @@ GtAwsObject >> jsonObject [
 GtAwsObject >> jsonObject: anObject [
 
 	jsonObject := anObject
+]
+
+{ #category : #accessing }
+GtAwsObject >> lookupInCloudFormation [
+	^ self subclassResponsibility
 ]

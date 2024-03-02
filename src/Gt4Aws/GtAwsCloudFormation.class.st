@@ -3,7 +3,11 @@ Class {
 	#superclass : #Object,
 	#instVars : [
 		'client',
-		'stacks'
+		'stacks',
+		'resources',
+		'resourceFuture',
+		'deployedResources',
+		'deployedResourceFuture'
 	],
 	#category : #'Gt4Aws-Model'
 }
@@ -17,6 +21,15 @@ GtAwsCloudFormation >> client [
 { #category : #accessing }
 GtAwsCloudFormation >> client: anObject [
 	client := anObject
+]
+
+{ #category : #accessing }
+GtAwsCloudFormation >> deployedResources [
+	deployedResources
+		ifNil: [ deployedResourceFuture
+				ifNil: [ resourceFuture := [ self refreshDeployedResources ] asAsyncFuture await ].
+			^ deployedResourceFuture ].
+	^ deployedResources
 ]
 
 { #category : #printing }
@@ -106,9 +119,41 @@ GtAwsCloudFormation >> latestStacksByStatus [
 	^ self latestStacks groupedBy: #status
 ]
 
+{ #category : #accessing }
+GtAwsCloudFormation >> lookupObject: aString [
+	deployedResources := self deployedResources.
+	^ deployedResources isAsyncPromise
+		ifTrue: [ deployedResources ]
+		ifFalse: [ deployedResources
+				detect: [ :aResource | 
+					aResource physicalResourceId = aString ]
+				ifNone: [ nil ] ]
+]
+
+{ #category : #accessing }
+GtAwsCloudFormation >> refreshDeployedResources [
+	deployedResources := (self stacks select: [ :aStack | aStack isDeleted not ])
+			flatCollect: [ :aStack | [ aStack resources ] on: Error do: [ {} ] ]
+]
+
+{ #category : #accessing }
+GtAwsCloudFormation >> refreshResources [
+	resources := self stacks
+			flatCollect: [ :aStack | [ aStack resources ] on: Error do: [ {} ] ]
+]
+
 { #category : #requests }
 GtAwsCloudFormation >> refreshStacks [
 	^ stacks := client cloudformationListStacks
+]
+
+{ #category : #accessing }
+GtAwsCloudFormation >> resources [
+	resources
+		ifNil: [ resourceFuture
+				ifNil: [ resourceFuture := [ self refreshResources ] asAsyncFuture await ].
+			^ resourceFuture ].
+	^ resources
 ]
 
 { #category : #requests }

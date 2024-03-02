@@ -128,6 +128,11 @@ GtAwsCloudformationStack >> id: anObject [
 ]
 
 { #category : #accessing }
+GtAwsCloudformationStack >> isDeleted [
+	^ self status = 'DELETE_COMPLETE'
+]
+
+{ #category : #accessing }
 GtAwsCloudformationStack >> lastTouched [
 	| lastTouched |
 	lastTouched := created.
@@ -170,7 +175,8 @@ GtAwsCloudformationStack >> printOn: aStream [
 
 { #category : #accessing }
 GtAwsCloudformationStack >> refreshResources [
-	^ resources := self client cloudformationListStackResourcesFor: self id
+	^ resources := (self client cloudformationListStackResourcesFor: self id)
+			collect: [ :aResource | aResource stack: self ]
 ]
 
 { #category : #accessing }

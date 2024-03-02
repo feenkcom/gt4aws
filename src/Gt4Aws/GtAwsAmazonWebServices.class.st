@@ -5,7 +5,8 @@ Class {
 		'monitor',
 		'awsRegion',
 		'instanceTypes',
-		'retryCount'
+		'retryCount',
+		'cloudformation'
 	],
 	#classInstVars : [
 		'uniqueInstance'
@@ -168,7 +169,11 @@ GtAwsAmazonWebServices >> awsRegion: aString [
 GtAwsAmazonWebServices >> cloudformation [
 	"Model and provision all your cloud infrastructure"
 
-	^ GtAwsCloudFormation new client: self
+	^ cloudformation
+		ifNil: [ cloudformation := GtAwsCloudFormation new
+					client: self;
+					resources;
+					yourself ]
 ]
 
 { #category : #accessing }
@@ -631,7 +636,8 @@ GtAwsAmazonWebServices >> s3Ls [
 					words := Character space split: aLine.
 					GtAwsS3Bucket new
 						modifiedAt: (DateAndTime fromString: words first , ' ' , words second);
-						name: words third ])
+						name: words third;
+						client: self ])
 ]
 
 { #category : #accessing }

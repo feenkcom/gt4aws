@@ -1,12 +1,17 @@
 Class {
 	#name : #GtAwsS3Bucket,
-	#superclass : #Object,
+	#superclass : #GtAwsObject,
 	#instVars : [
 		'modifiedAt',
 		'name'
 	],
 	#category : #'Gt4Aws-Model'
 }
+
+{ #category : #accessing }
+GtAwsS3Bucket >> lookupInCloudFormation [
+	^ self client cloudformation lookupObject: self name
+]
 
 { #category : #accessing }
 GtAwsS3Bucket >> modifiedAt [
