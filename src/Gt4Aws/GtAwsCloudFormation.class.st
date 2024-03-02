@@ -27,7 +27,7 @@ GtAwsCloudFormation >> client: anObject [
 GtAwsCloudFormation >> deployedResources [
 	deployedResources
 		ifNil: [ deployedResourceFuture
-				ifNil: [ resourceFuture := [ self refreshDeployedResources ] asAsyncFuture await ].
+				ifNil: [ deployedResourceFuture := [ self refreshDeployedResources ] asAsyncFuture await ].
 			^ deployedResourceFuture ].
 	^ deployedResources
 ]

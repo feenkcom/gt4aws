@@ -172,7 +172,7 @@ GtAwsAmazonWebServices >> cloudformation [
 	^ cloudformation
 		ifNil: [ cloudformation := GtAwsCloudFormation new
 					client: self;
-					resources;
+					deployedResources;
 					yourself ]
 ]
 
