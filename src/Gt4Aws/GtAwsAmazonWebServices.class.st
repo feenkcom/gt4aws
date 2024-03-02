@@ -308,6 +308,30 @@ GtAwsAmazonWebServices >> ec2ListInstances [
 	^ GtAwsEc2InstanceGroup withAll: aCollection
 ]
 
+{ #category : #'gt - extensions' }
+GtAwsAmazonWebServices >> eks [
+	^ GtAwsEks new client: self
+]
+
+{ #category : #accessing }
+GtAwsAmazonWebServices >> eksListClusters [
+	| proc aCollection |
+	proc := GtSubprocessWithInMemoryOutput
+			command: self awsExecutable
+			arguments: {'eks'.
+					'list-clusters'}.
+	proc
+		retryCount: retryCount;
+		addAllEnvVariablesFromParentWithoutOverride;
+		setDefaultErrorBlock.
+	monitor critical: [ proc runAndWait ].
+
+	aCollection := ((STONJSON fromString: proc stdout) at: 'clusters')
+			collect: [ :aDict | (GtAwsEksCluster fromDictionary: aDict) client: self ].
+
+	^ GtAwsEksClusterGroup withAll: aCollection
+]
+
 { #category : #logging }
 GtAwsAmazonWebServices >> emitAwsCommandEndedSignal [
 	(GtAwsWebServiceCommandEndSignal new) emit
@@ -389,6 +413,7 @@ GtAwsAmazonWebServices >> gtNavigations [
 		at: 'RDS' put: self rds;
 		at: 'S3' put: self s3;
 		at: 'EC2' put: self ec2;
+		at: 'EKS' put: self eks;
 		yourself
 ]
 
