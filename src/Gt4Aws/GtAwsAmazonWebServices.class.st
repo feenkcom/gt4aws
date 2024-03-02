@@ -240,6 +240,11 @@ GtAwsAmazonWebServices >> deleteAllInS3Url: s3Url [
 			self emitAwsCommandEndedSignal  ] ].
 ]
 
+{ #category : #'gt - extensions' }
+GtAwsAmazonWebServices >> ec2 [
+	^ GtAwsEc2 new client: self
+]
+
 { #category : #accessing }
 GtAwsAmazonWebServices >> ec2Command: operation instanceId: instanceId notification: aString [
 	"Perform the specified operation on the instanceId and notify the user.
@@ -281,6 +286,26 @@ GtAwsAmazonWebServices >> ec2CreateTags: aCollectionOfAssociations instanceId: a
 		addAllEnvVariablesFromParentWithoutOverride;
 		setDefaultErrorBlock.
 	monitor critical: [ proc runAndWait ].
+]
+
+{ #category : #accessing }
+GtAwsAmazonWebServices >> ec2ListInstances [
+	| proc aCollection |
+	proc := GtSubprocessWithInMemoryOutput
+			command: self awsExecutable
+			arguments: {'ec2'.
+					'describe-instances'}.
+	proc
+		retryCount: retryCount;
+		addAllEnvVariablesFromParentWithoutOverride;
+		setDefaultErrorBlock.
+	monitor critical: [ proc runAndWait ].
+
+	aCollection := (((STONJSON fromString: proc stdout) at: 'Reservations')
+			flatCollect: [ :aReservation | aReservation at: 'Instances' ])
+			collect: [ :aDict | (GtAwsEc2Instance fromDictionary: aDict) client: self ].
+
+	^ GtAwsEc2InstanceGroup withAll: aCollection
 ]
 
 { #category : #logging }
@@ -363,6 +388,7 @@ GtAwsAmazonWebServices >> gtNavigations [
 		at: 'Lambda' put: self lambda;
 		at: 'RDS' put: self rds;
 		at: 'S3' put: self s3;
+		at: 'EC2' put: self ec2;
 		yourself
 ]
 

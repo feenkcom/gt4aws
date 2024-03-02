@@ -4,7 +4,7 @@ Class {
 	#instVars : [
 		'client'
 	],
-	#category : #'Gt4Aws-Client'
+	#category : #'Gt4Aws-Model'
 }
 
 { #category : #accessing }

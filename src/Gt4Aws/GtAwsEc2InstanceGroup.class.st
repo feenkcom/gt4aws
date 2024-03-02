@@ -1,19 +1,19 @@
 Class {
-	#name : #GtAwsLambdaFunctionGroup,
+	#name : #GtAwsEc2InstanceGroup,
 	#superclass : #GtAwsGroup,
 	#category : #'Gt4Aws-Model'
 }
 
 { #category : #accessing }
-GtAwsLambdaFunctionGroup >> gtFunctionsFor: aView [
+GtAwsEc2InstanceGroup >> gtInstancesFor: aView [
 	<gtView>
 	^ aView columnedList
-		title: 'Functions';
+		title: 'Instances';
 		priority: 1;
 		items: [ self items ];
-		column: 'Name' text: #name;
-		column: 'ARN' text: #arn;
-		column: 'Description' text: #description;
+		column: 'Id' text: #id;
+		column: 'Type' text: #type;
+		column: 'Launch Time' text: #launchTime;
 		column: 'In CF'
 			icon: [ :anInstance | 
 				anInstance lookupInCloudFormation
