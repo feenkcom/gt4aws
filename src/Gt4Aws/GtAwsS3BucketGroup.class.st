@@ -12,5 +12,12 @@ GtAwsS3BucketGroup >> gtBucketsFor: aView [
 		priority: 1;
 		items: [ self items ];
 		column: 'Name' text: #name;
-		column: 'Modified at' text: #modifiedAt width: 180
+		column: 'Modified at'
+			text: #modifiedAt
+			width: 180;
+		column: 'In CF'
+			icon: [ :aBucket | 
+				aBucket lookupInCloudFormation
+					ifNil: [ BrGlamorousVectorIcons transparent ]
+					ifNotNil: [ BrGlamorousVectorIcons accept ] ]
 ]

@@ -53,6 +53,11 @@ GtAwsLambdaFunction >> description: anObject [
 ]
 
 { #category : #accessing }
+GtAwsLambdaFunction >> lookupInCloudFormation [
+	^ self client cloudformation lookupObject: self name
+]
+
+{ #category : #accessing }
 GtAwsLambdaFunction >> name [
 	^ name
 ]

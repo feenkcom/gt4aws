@@ -13,5 +13,11 @@ GtAwsLambdaFunctionGroup >> gtFunctionsFor: aView [
 		items: [ self items ];
 		column: 'Name' text: #name;
 		column: 'ARN' text: #arn;
-		column: 'Description' text: #description
+		column: 'Description' text: #description;
+		column: 'In CF'
+			stencil: [ :aFunction | 
+				aFunction lookupInCloudFormation
+					ifNil: [ BrGlamorousVectorIcons transparent ]
+					ifNotNil: [ BrGlamorousVectorIcons accept ] ]
+			width: 40
 ]
