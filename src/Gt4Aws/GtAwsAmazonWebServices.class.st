@@ -309,6 +309,30 @@ GtAwsAmazonWebServices >> ec2ListInstances [
 ]
 
 { #category : #'gt - extensions' }
+GtAwsAmazonWebServices >> efs [
+	^ GtAwsEfs new client: self
+]
+
+{ #category : #accessing }
+GtAwsAmazonWebServices >> efsListFileSystems [
+	| proc aCollection |
+	proc := GtSubprocessWithInMemoryOutput
+			command: self awsExecutable
+			arguments: {'efs'.
+					'describe-file-systems'}.
+	proc
+		retryCount: retryCount;
+		addAllEnvVariablesFromParentWithoutOverride;
+		setDefaultErrorBlock.
+	monitor critical: [ proc runAndWait ].
+
+	aCollection := ((STONJSON fromString: proc stdout) at: 'FileSystems')
+			collect: [ :aDict | (GtAwsEfsFileSystem fromDictionary: aDict) client: self ].
+
+	^ GtAwsEfsFileSystemGroup withAll: aCollection
+]
+
+{ #category : #'gt - extensions' }
 GtAwsAmazonWebServices >> eks [
 	^ GtAwsEks new client: self
 ]
@@ -414,6 +438,7 @@ GtAwsAmazonWebServices >> gtNavigations [
 		at: 'S3' put: self s3;
 		at: 'EC2' put: self ec2;
 		at: 'EKS' put: self eks;
+		at: 'EFS' put: self efs;
 		yourself
 ]
 

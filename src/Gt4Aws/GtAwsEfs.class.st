@@ -1,5 +1,5 @@
 Class {
-	#name : #GtAwsEks,
+	#name : #GtAwsEfs,
 	#superclass : #Object,
 	#instVars : [
 		'client'
@@ -8,30 +8,30 @@ Class {
 }
 
 { #category : #accessing }
-GtAwsEks >> client [
+GtAwsEfs >> client [
 	^ client
 ]
 
 { #category : #accessing }
-GtAwsEks >> client: anObject [
+GtAwsEfs >> client: anObject [
 	client := anObject
 ]
 
 { #category : #accessing }
-GtAwsEks >> clusters [
-	^ self client eksListClusters
+GtAwsEfs >> filesystems [
+	^ self client efsListFileSystems
 ]
 
 { #category : #accessing }
-GtAwsEks >> gtListClustersFor: aView [
+GtAwsEfs >> gtListFileSystemsFor: aView [
 	<gtView>
 	^ aView list
-		title: 'Clusters';
+		title: 'File systems';
 		priority: 1;
-		items: [ self clusters ]
+		items: [ self filesystems ]
 ]
 
 { #category : #accessing }
-GtAwsEks >> printOn: aStream [
-	aStream nextPutAll: 'AWS Elastic Kubernetes Service'
+GtAwsEfs >> printOn: aStream [
+	^ aStream nextPutAll: 'AWS Elastic File System'
 ]

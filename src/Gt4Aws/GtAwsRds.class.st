@@ -26,3 +26,12 @@ GtAwsRds >> databases [
 GtAwsRds >> gtDisplayOn: stream [
 	stream nextPutAll: 'AWS Relational Database Service'
 ]
+
+{ #category : #accessing }
+GtAwsRds >> gtListDatabasesFor: aView [
+	<gtView>
+	^ aView list
+		title: 'Databases';
+		priority: 1;
+		items: [ self databases ]
+]
