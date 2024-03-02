@@ -19,5 +19,8 @@ GtAwsS3BucketGroup >> gtBucketsFor: aView [
 			icon: [ :aBucket | 
 				aBucket lookupInCloudFormation
 					ifNil: [ BrGlamorousVectorIcons transparent ]
-					ifNotNil: [ BrGlamorousVectorIcons accept ] ]
+					ifNotNil: [ :aValue | 
+						aValue isAsyncPromise
+							ifTrue: [ BrGlamorousVectorIcons refresh ]
+							ifFalse: [ BrGlamorousVectorIcons accept ] ] ]
 ]

@@ -121,12 +121,12 @@ GtAwsCloudFormation >> latestStacksByStatus [
 
 { #category : #accessing }
 GtAwsCloudFormation >> lookupObject: aString [
-	deployedResources := self deployedResources.
-	^ deployedResources isAsyncPromise
-		ifTrue: [ deployedResources ]
-		ifFalse: [ deployedResources
-				detect: [ :aResource | 
-					aResource physicalResourceId = aString ]
+	| deployedResourcesObject |
+	deployedResourcesObject := self deployedResources.
+	^ deployedResourcesObject isAsyncPromise
+		ifTrue: [ deployedResourcesObject ]
+		ifFalse: [ deployedResourcesObject
+				detect: [ :aResource | aResource physicalResourceId = aString ]
 				ifNone: [ nil ] ]
 ]
 

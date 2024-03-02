@@ -15,9 +15,12 @@ GtAwsLambdaFunctionGroup >> gtFunctionsFor: aView [
 		column: 'ARN' text: #arn;
 		column: 'Description' text: #description;
 		column: 'In CF'
-			stencil: [ :aFunction | 
-				aFunction lookupInCloudFormation
+			icon: [ :aBucket | 
+				aBucket lookupInCloudFormation
 					ifNil: [ BrGlamorousVectorIcons transparent ]
-					ifNotNil: [ BrGlamorousVectorIcons accept ] ]
+					ifNotNil: [ :aValue | 
+						aValue isAsyncPromise
+							ifTrue: [ BrGlamorousVectorIcons refresh ]
+							ifFalse: [ BrGlamorousVectorIcons accept ] ] ]
 			width: 40
 ]

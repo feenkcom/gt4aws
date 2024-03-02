@@ -7,7 +7,8 @@ Class {
 		'resourceType',
 		'lastUpdated',
 		'status',
-		'driftInformation'
+		'driftInformation',
+		'stack'
 	],
 	#category : #'Gt4Aws-Model'
 }
@@ -117,6 +118,16 @@ GtAwsCloudformationStackResource >> resourceType [
 { #category : #accessing }
 GtAwsCloudformationStackResource >> resourceType: anObject [
 	resourceType := anObject
+]
+
+{ #category : #accessing }
+GtAwsCloudformationStackResource >> stack [
+	^ stack
+]
+
+{ #category : #accessing }
+GtAwsCloudformationStackResource >> stack: anObject [
+	stack := anObject
 ]
 
 { #category : #accessing }
