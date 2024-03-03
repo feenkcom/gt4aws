@@ -132,14 +132,16 @@ GtAwsCloudFormation >> lookupObject: aString [
 
 { #category : #accessing }
 GtAwsCloudFormation >> refreshDeployedResources [
-	deployedResources := (self stacks select: [ :aStack | aStack isDeleted not ])
-			flatCollect: [ :aStack | [ aStack resources ] on: Error do: [ {} ] ]
+	deployedResources := GtAwsCloudFormationStackResourceGroup
+			withAll: ((self latestStacks select: [ :aStack | aStack isDeleted not ])
+					flatCollect: [ :aStack | [ aStack resources ] on: Error do: [ {} ] ])
 ]
 
 { #category : #accessing }
 GtAwsCloudFormation >> refreshResources [
-	resources := self stacks
-			flatCollect: [ :aStack | [ aStack resources ] on: Error do: [ {} ] ]
+	resources := GtAwsCloudFormationStackResourceGroup
+			withAll: (self stacks
+					flatCollect: [ :aStack | [ aStack resources ] on: Error do: [ {} ] ])
 ]
 
 { #category : #requests }

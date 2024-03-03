@@ -19,6 +19,16 @@ GtAwsEc2Instance class >> fromDictionary: aDict [
 ]
 
 { #category : #accessing }
+GtAwsEc2Instance class >> lookupEndpoint [
+	^ #ec2GetInstance:
+]
+
+{ #category : #accessing }
+GtAwsEc2Instance class >> resourceType [
+	^ 'AWS::EC2::Instance'
+]
+
+{ #category : #accessing }
 GtAwsEc2Instance >> id [
 	^ id
 ]
