@@ -56,6 +56,12 @@ GtAwsCloudformationStackResource >> gtInspectResourceFor: anAction [
 ]
 
 { #category : #accessing }
+GtAwsCloudformationStackResource >> gtLookupInCloudFormationActionFor: anAction [
+	<gtAction>
+	^ anAction noAction
+]
+
+{ #category : #accessing }
 GtAwsCloudformationStackResource >> hasResourceClass [
 	^ (GtAwsObject forResourceType: self resourceType ifNotFound: [ nil ]) isNotNil
 ]

@@ -289,6 +289,26 @@ GtAwsAmazonWebServices >> ec2CreateTags: aCollectionOfAssociations instanceId: a
 ]
 
 { #category : #accessing }
+GtAwsAmazonWebServices >> ec2GetInstance: anId [
+	| proc |
+	proc := GtSubprocessWithInMemoryOutput
+			command: self awsExecutable
+			arguments: {'ec2'.
+					'describe-instances'.
+					'--instance-ids'.
+					anId}.
+	proc
+		retryCount: retryCount;
+		addAllEnvVariablesFromParentWithoutOverride;
+		setDefaultErrorBlock.
+	monitor critical: [ proc runAndWait ].
+
+	^ GtAwsEc2Instance
+		fromDictionary: (((STONJSON fromString: proc stdout) at: 'Reservations') first at: 'Instances')
+				first
+]
+
+{ #category : #accessing }
 GtAwsAmazonWebServices >> ec2ListInstances [
 	| proc aCollection |
 	proc := GtSubprocessWithInMemoryOutput
@@ -691,6 +711,11 @@ GtAwsAmazonWebServices >> s3DownloadDir: s3DirString to: aFileReference [
 		thenDo: [ :fileData |
 			self s3Cp: s3DirString, fileData basename to: (aFileReference / fileData basename) fullName ].
 	^ aFileReference.
+]
+
+{ #category : #accessing }
+GtAwsAmazonWebServices >> s3GetBucket: aBucketId [
+	^ self s3Ls detect: [ :aBucket | aBucket name = aBucketId ]
 ]
 
 { #category : #accessing }

@@ -13,13 +13,21 @@ Class {
 
 { #category : #accessing }
 GtAwsLambdaFunction class >> fromDictionary: aDict [
-	^ self new
-		jsonObject: aDict;
-		description: (aDict at: 'Description');
-		arn: (aDict at: 'FunctionArn');
-		name: (aDict at: 'FunctionName');
-		version: (aDict at: 'Version');
-		runtime: (aDict at: 'Runtime')
+	| anInstance configDict |
+	anInstance := self new jsonObject: aDict.
+
+	configDict := (aDict includesKey: 'Configuration')
+			ifTrue: [ aDict at: 'Configuration' ]
+			ifFalse: [ aDict ].
+
+	anInstance
+		description: (configDict at: 'Description');
+		arn: (configDict at: 'FunctionArn');
+		name: (configDict at: 'FunctionName');
+		version: (configDict at: 'Version');
+		runtime: (configDict at: 'Runtime').
+
+	^ anInstance
 ]
 
 { #category : #accessing }

@@ -9,6 +9,16 @@ Class {
 }
 
 { #category : #accessing }
+GtAwsS3Bucket class >> lookupEndpoint [
+	^ #s3GetBucket:
+]
+
+{ #category : #accessing }
+GtAwsS3Bucket class >> resourceType [
+	^ 'AWS::S3::Bucket'
+]
+
+{ #category : #accessing }
 GtAwsS3Bucket >> lookupInCloudFormation [
 	^ self client cloudformation lookupObject: self name
 ]
