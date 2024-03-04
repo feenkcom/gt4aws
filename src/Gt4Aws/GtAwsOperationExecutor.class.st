@@ -12,9 +12,10 @@ Class {
 { #category : #accessing }
 GtAwsOperationExecutor >> deserialize: anObject [
 	^ GtAwsOperationResult new
-		result: anObject;
+		key: 'Response';
+		result: (STONJSON fromString: anObject);
 		resultType: (self operation at: 'output' at: 'shape');
-		types: (self service at: 'shapes')
+		types: self service shapes
 ]
 
 { #category : #accessing }

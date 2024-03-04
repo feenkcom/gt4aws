@@ -122,6 +122,11 @@ GtAwsService >> serviceId [
 ]
 
 { #category : #accessing }
+GtAwsService >> shapes [
+	^ self rawData at: 'shapes'
+]
+
+{ #category : #accessing }
 GtAwsService >> version [
 	^ self rawData at: 'version'
 ]
