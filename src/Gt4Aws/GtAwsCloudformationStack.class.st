@@ -175,8 +175,9 @@ GtAwsCloudformationStack >> printOn: aStream [
 
 { #category : #accessing }
 GtAwsCloudformationStack >> refreshResources [
-	^ resources := (self client cloudformationListStackResourcesFor: self id)
-			collect: [ :aResource | aResource stack: self ]
+	^ resources := GtAwsCloudFormationStackResourceGroup
+			withAll: ((self client cloudformationListStackResourcesFor: self id)
+					collect: [ :aResource | aResource stack: self ])
 ]
 
 { #category : #accessing }
