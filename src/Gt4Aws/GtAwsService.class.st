@@ -3,13 +3,19 @@ Class {
 	#superclass : #Object,
 	#instVars : [
 		'file',
-		'rawData'
+		'rawData',
+		'operationExecutor'
 	],
 	#category : #'Gt4Aws-Importer'
 }
 
 { #category : #accessing }
 GtAwsService >> authenticateClient: client [ 
+]
+
+{ #category : #accessing }
+GtAwsService >> defaultOperationExecutor [
+	^ GtAwsCliExecutor
 ]
 
 { #category : #accessing }
@@ -43,6 +49,13 @@ GtAwsService >> gtRawFor: aView [
 ]
 
 { #category : #accessing }
+GtAwsService >> initialize [
+	super initialize.
+	
+	self operationExecutor: self defaultOperationExecutor
+]
+
+{ #category : #accessing }
 GtAwsService >> metadata [
 	^ self rawData at: 'metadata'
 ]
@@ -60,12 +73,13 @@ GtAwsService >> operationAt: aString [
 ]
 
 { #category : #accessing }
-GtAwsService >> operationToArguments: anOperation [
-	| mangledOperationName |
-	mangledOperationName := '-'
-			join: ((anOperation at: 'name') splitCamelCase collect: #asLowercase).
-	^ {self endpointPrefix.
-		mangledOperationName}
+GtAwsService >> operationExecutor [
+	^ operationExecutor
+]
+
+{ #category : #accessing }
+GtAwsService >> operationExecutor: anObject [
+	operationExecutor := anObject
 ]
 
 { #category : #accessing }
@@ -75,13 +89,11 @@ GtAwsService >> operations [
 
 { #category : #accessing }
 GtAwsService >> performOperation: anOperation inZone: aZone [
-	| operation |
-	operation := self operationAt: anOperation.
-
-	^ GtAwsAmazonWebServices default
-		runArguments: (self operationToArguments: operation)
-		returnBlock: #stdout
-		retryCount: 3
+	^ self operationExecutor new
+		service: self;
+		operation: (self operationAt: anOperation);
+		zone: aZone;
+		run
 ]
 
 { #category : #accessing }

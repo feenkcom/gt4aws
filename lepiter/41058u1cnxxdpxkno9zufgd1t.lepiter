@@ -279,14 +279,14 @@
 					"__type" : "time",
 					"time" : {
 						"__type" : "dateAndTime",
-						"dateAndTimeString" : "2024-03-02T16:33:16.405772+01:00"
+						"dateAndTimeString" : "2024-03-04T13:16:19.244244+01:00"
 					}
 				},
 				"uid" : {
 					"__type" : "uid",
 					"uidString" : "DFT0vhDPDQCUa+B2ARTptg=="
 				},
-				"code" : "ec2Service := services serviceNamed:'EKS'.\r\rec2Service performOperation: 'ListClusters' inZone: 'eu-central-1'"
+				"code" : "eksService := services serviceNamed:'EKS'.\r\reksService performOperation: 'ListClusters' inZone: 'eu-central-1'"
 			}
 		]
 	},
