@@ -60,33 +60,28 @@ GtAwsService >> operationAt: aString [
 ]
 
 { #category : #accessing }
+GtAwsService >> operationToArguments: anOperation [
+	| mangledOperationName |
+	mangledOperationName := '-'
+			join: ((anOperation at: 'name') splitCamelCase collect: #asLowercase).
+	^ {self endpointPrefix.
+		mangledOperationName}
+]
+
+{ #category : #accessing }
 GtAwsService >> operations [
 	^ self rawData at: 'operations'
 ]
 
 { #category : #accessing }
 GtAwsService >> performOperation: anOperation inZone: aZone [
-	| operation client response |
+	| operation |
 	operation := self operationAt: anOperation.
-	client := ZnClient new
-			url: 'https://' , self endpointPrefix , '.' , aZone , '.amazonaws.com'
-					, (operation at: 'http' at: 'requestUri');
-			method: (operation at: 'http' at: 'method').
-	
-	self authenticateClient: client.
-			
-	response := client
-			execute;
-			response.
 
-	response isError
-		ifTrue: [ GtAwsError new
-				response: response;
-				signal ].
-
-	^ GtAwsResponse new
-		content: response content;
-		operation: operation
+	^ GtAwsAmazonWebServices default
+		runArguments: (self operationToArguments: operation)
+		returnBlock: #stdout
+		retryCount: 3
 ]
 
 { #category : #accessing }
