@@ -71,6 +71,20 @@ GtAwsCloudFormation >> gtRefreshStacksFor: anAction [
 		action: [ self refreshStacks ]
 ]
 
+{ #category : #'gt - extensions' }
+GtAwsCloudFormation >> gtResourceTreeFor: aView [
+	<gtView>
+	client ifNil: [ ^ aView empty ].
+	^ aView columnedTree
+		title: 'Resource tree';
+		priority: 10;
+		items: [ self stacks ];
+		children: #treeChildren;
+		column: 'Type' text: #treeType width: 200;
+		column: 'ID' text: #treeId;
+		column: 'Status' text: #statusLabel width: 170
+]
+
 { #category : #accessing }
 GtAwsCloudFormation >> gtSearchStacksFor: aSearch [
 	<gtSearch>

@@ -150,3 +150,18 @@ GtAwsCloudformationStackResource >> status: anObject [
 GtAwsCloudformationStackResource >> statusLabel [
 	^ (GtAwsStatus forName: status) label
 ]
+
+{ #category : #accessing }
+GtAwsCloudformationStackResource >> treeChildren [
+	^ {}
+]
+
+{ #category : #accessing }
+GtAwsCloudformationStackResource >> treeId [
+	^ self logicalResourceId
+]
+
+{ #category : #accessing }
+GtAwsCloudformationStackResource >> treeType [
+	^ 'Stack resource'
+]

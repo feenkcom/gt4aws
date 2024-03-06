@@ -214,3 +214,22 @@ GtAwsCloudformationStack >> templateDescription [
 GtAwsCloudformationStack >> templateDescription: anObject [
 	templateDescription := anObject
 ]
+
+{ #category : #accessing }
+GtAwsCloudformationStack >> treeChildren [
+	^ (self resources groupedBy: #resourceType)
+		collect: [ :aResourceGroup | 
+			GtAwsCloudformationTreeResourceGroup new
+				group: aResourceGroup;
+				resourceType: aResourceGroup first resourceType ]
+]
+
+{ #category : #accessing }
+GtAwsCloudformationStack >> treeId [
+	^ self name
+]
+
+{ #category : #accessing }
+GtAwsCloudformationStack >> treeType [
+	^ 'Stack'
+]
