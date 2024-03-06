@@ -74,3 +74,10 @@ GtAwsRDSInstance >> status [
 GtAwsRDSInstance >> status: anObject [
 	status := anObject
 ]
+
+{ #category : #accessing }
+GtAwsRDSInstance >> tagAt: aName [
+	^ (self jsonObject at: 'TagList')
+		detect: [ :aTag | (aTag at: 'Key') = aName ]
+		ifOne: [ :aTag | aTag at: 'Value' ]
+]

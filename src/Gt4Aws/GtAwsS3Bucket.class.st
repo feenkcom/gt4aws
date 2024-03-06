@@ -3,7 +3,8 @@ Class {
 	#superclass : #GtAwsObject,
 	#instVars : [
 		'modifiedAt',
-		'name'
+		'name',
+		'tags'
 	],
 	#category : #'Gt4Aws-Model'
 }
@@ -51,4 +52,20 @@ GtAwsS3Bucket >> printOn: aStream [
 		nextPut: $(;
 		nextPutAll: self name;
 		nextPut: $)
+]
+
+{ #category : #accessing }
+GtAwsS3Bucket >> refreshTags [
+	^ tags := ((self client s3ListTagsForBucket: self name)
+			collect: [ :aDict | (aDict at: 'Key') -> (aDict at: 'Value') ]) asDictionary
+]
+
+{ #category : #accessing }
+GtAwsS3Bucket >> tagAt: aName [
+	^ self tags at: aName
+]
+
+{ #category : #accessing }
+GtAwsS3Bucket >> tags [
+	^ tags ifNil: [ self refreshTags ]
 ]

@@ -93,3 +93,8 @@ GtAwsObject >> jsonObject: anObject [
 GtAwsObject >> lookupInCloudFormation [
 	^ self subclassResponsibility
 ]
+
+{ #category : #accessing }
+GtAwsObject >> tagAt: aName [
+	^ self subclassResponsibility
+]

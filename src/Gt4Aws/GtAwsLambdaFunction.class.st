@@ -6,7 +6,8 @@ Class {
 		'arn',
 		'name',
 		'version',
-		'runtime'
+		'runtime',
+		'tags'
 	],
 	#category : #'Gt4Aws-Model'
 }
@@ -76,6 +77,11 @@ GtAwsLambdaFunction >> name: anObject [
 ]
 
 { #category : #accessing }
+GtAwsLambdaFunction >> refreshTags [
+	^ tags := self client lambdaListFunctionTagsFor: self arn
+]
+
+{ #category : #accessing }
 GtAwsLambdaFunction >> runtime [
 	^ runtime
 ]
@@ -83,6 +89,16 @@ GtAwsLambdaFunction >> runtime [
 { #category : #accessing }
 GtAwsLambdaFunction >> runtime: anObject [
 	runtime := anObject
+]
+
+{ #category : #accessing }
+GtAwsLambdaFunction >> tagAt: aName [
+	^ self tags at: aName
+]
+
+{ #category : #accessing }
+GtAwsLambdaFunction >> tags [
+	^ tags ifNil: [ self refreshTags ]
 ]
 
 { #category : #accessing }

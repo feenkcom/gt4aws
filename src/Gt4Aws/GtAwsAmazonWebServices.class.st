@@ -516,6 +516,24 @@ GtAwsAmazonWebServices >> lambdaGetFunction: anId [
 ]
 
 { #category : #accessing }
+GtAwsAmazonWebServices >> lambdaListFunctionTagsFor: anArn [
+	| proc |
+	proc := GtSubprocessWithInMemoryOutput
+			command: self awsExecutable
+			arguments: {'lambda'.
+					'list-tags'.
+					'--resource'.
+					anArn}.
+	proc
+		retryCount: retryCount;
+		addAllEnvVariablesFromParentWithoutOverride;
+		setDefaultErrorBlock.
+	monitor critical: [ proc runAndWait ].
+
+	^ (STONJSON fromString: proc stdout) at: 'Tags'
+]
+
+{ #category : #accessing }
 GtAwsAmazonWebServices >> lambdaListFunctions [
 	| proc aCollection |
 	proc := GtSubprocessWithInMemoryOutput
@@ -712,6 +730,24 @@ GtAwsAmazonWebServices >> s3DownloadDir: s3DirString to: aFileReference [
 { #category : #accessing }
 GtAwsAmazonWebServices >> s3GetBucket: aBucketId [
 	^ self s3Ls detect: [ :aBucket | aBucket name = aBucketId ]
+]
+
+{ #category : #accessing }
+GtAwsAmazonWebServices >> s3ListTagsForBucket: aName [
+	| proc |
+	proc := GtSubprocessWithInMemoryOutput
+			command: self awsExecutable
+			arguments: {'s3api'.
+					'get-bucket-tagging'.
+					'--bucket'.
+					aName}.
+	proc
+		retryCount: retryCount;
+		addAllEnvVariablesFromParentWithoutOverride;
+		setDefaultErrorBlock.
+	monitor critical: [ proc runAndWait ].
+
+	^ (STONJSON fromString: proc stdout) at: 'TagSet'
 ]
 
 { #category : #accessing }
