@@ -54,6 +54,13 @@ GtAwsEc2Instance >> lookupInCloudFormation [
 ]
 
 { #category : #accessing }
+GtAwsEc2Instance >> tagAt: aName [
+	^ (self jsonObject at: 'Tags')
+		detect: [ :aTag | (aTag at: 'Key') = aName ]
+		ifOne: [ :aTag | aTag at: 'Value' ]
+]
+
+{ #category : #accessing }
 GtAwsEc2Instance >> type [
 	^ type
 ]
