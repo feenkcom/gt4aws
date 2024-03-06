@@ -30,8 +30,9 @@ GtAwsRds >> gtDisplayOn: stream [
 { #category : #accessing }
 GtAwsRds >> gtListDatabasesFor: aView [
 	<gtView>
-	^ aView list
+	^ aView forward
 		title: 'Databases';
 		priority: 1;
-		items: [ self databases ]
+		object: [ self databases ];
+		view: #gtDatabasesFor:
 ]

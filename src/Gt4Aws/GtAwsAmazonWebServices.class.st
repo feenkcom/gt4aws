@@ -618,13 +618,9 @@ GtAwsAmazonWebServices >> rdsDescribeInstances [
 		addAllEnvVariablesFromParentWithoutOverride;
 		setDefaultErrorBlock.
 	monitor critical: [ proc runAndWait ].
-
 	aCollection := ((STONJSON fromString: proc stdout) at: 'DBInstances')
-		collect: [ :anInstance | 
-			GtAwsRDSInstance new
-				client: self;
-				jsonObject: (STONJSON fromString: proc stdout) ].
-				
+			collect: [ :anInstance | (GtAwsRDSInstance fromDictionary: anInstance) client: self ].
+
 	^ GtAwsRDSInstanceGroup withAll: aCollection
 ]
 

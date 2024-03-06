@@ -1,8 +1,24 @@
 Class {
 	#name : #GtAwsRDSInstance,
 	#superclass : #GtAwsObject,
+	#instVars : [
+		'name',
+		'status',
+		'instanceClass',
+		'id'
+	],
 	#category : #'Gt4Aws-Model'
 }
+
+{ #category : #accessing }
+GtAwsRDSInstance class >> fromDictionary: aDict [
+	^ self new
+		jsonObject: aDict;
+		name: (aDict at: 'DBName');
+		status: (aDict at: 'DBInstanceStatus');
+		instanceClass: (aDict at: 'DBInstanceClass');
+		id: (aDict at:'DBInstanceIdentifier')
+]
 
 { #category : #accessing }
 GtAwsRDSInstance class >> lookupEndpoint [
@@ -12,4 +28,49 @@ GtAwsRDSInstance class >> lookupEndpoint [
 { #category : #accessing }
 GtAwsRDSInstance class >> resourceType [
 	^ 'AWS::RDS::DBInstance'
+]
+
+{ #category : #accessing }
+GtAwsRDSInstance >> id [
+	^ id
+]
+
+{ #category : #accessing }
+GtAwsRDSInstance >> id: anObject [
+	id := anObject
+]
+
+{ #category : #accessing }
+GtAwsRDSInstance >> instanceClass [
+	^ instanceClass
+]
+
+{ #category : #accessing }
+GtAwsRDSInstance >> instanceClass: anObject [
+	instanceClass := anObject
+]
+
+{ #category : #accessing }
+GtAwsRDSInstance >> lookupInCloudFormation [
+	^ self client cloudformation lookupObject: self id
+]
+
+{ #category : #accessing }
+GtAwsRDSInstance >> name [
+	^ name
+]
+
+{ #category : #accessing }
+GtAwsRDSInstance >> name: anObject [
+	name := anObject
+]
+
+{ #category : #accessing }
+GtAwsRDSInstance >> status [
+	^ status
+]
+
+{ #category : #accessing }
+GtAwsRDSInstance >> status: anObject [
+	status := anObject
 ]
