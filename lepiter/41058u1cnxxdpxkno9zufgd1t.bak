@@ -279,14 +279,14 @@
 					"__type" : "time",
 					"time" : {
 						"__type" : "dateAndTime",
-						"dateAndTimeString" : "2024-03-02T16:33:16.405772+01:00"
+						"dateAndTimeString" : "2024-03-04T17:10:33.756055+01:00"
 					}
 				},
 				"uid" : {
 					"__type" : "uid",
 					"uidString" : "DFT0vhDPDQCUa+B2ARTptg=="
 				},
-				"code" : "ec2Service := services serviceNamed:'EKS'.\r\rec2Service performOperation: 'ListClusters' inZone: 'eu-central-1'"
+				"code" : "eksService := services serviceNamed:'EC2'.\r\reksService performOperation: 'ListClusters' inZone: 'eu-central-1'"
 			}
 		]
 	},
@@ -309,12 +309,12 @@
 		"__type" : "time",
 		"time" : {
 			"__type" : "dateAndTime",
-			"dateAndTimeString" : "2024-03-02T15:00:04.195985+01:00"
+			"dateAndTimeString" : "2024-03-03T14:38:09.491232+01:00"
 		}
 	},
 	"pageType" : {
 		"__type" : "namedPage",
-		"title" : "Generating client code"
+		"title" : "Importing service definitions from botocore"
 	},
 	"uid" : {
 		"__type" : "uuid",
