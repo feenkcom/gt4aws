@@ -3,7 +3,8 @@ Class {
 	#superclass : #GtAwsObject,
 	#instVars : [
 		'url',
-		'attributes'
+		'attributes',
+		'tags'
 	],
 	#category : #'Gt4Aws-Model'
 }
@@ -46,6 +47,21 @@ GtAwsSQSQueue >> printOn: aStream [
 		nextPut: $(;
 		nextPutAll: self url;
 		nextPut: $)
+]
+
+{ #category : #accessing }
+GtAwsSQSQueue >> refreshTags [
+	^ tags := self client sqsListQueueTagsFor: self url
+]
+
+{ #category : #accessing }
+GtAwsSQSQueue >> tagAt: aName [
+	self tags at: aName
+]
+
+{ #category : #accessing }
+GtAwsSQSQueue >> tags [
+	^ tags ifNil: [ self refreshTags ]
 ]
 
 { #category : #accessing }

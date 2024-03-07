@@ -77,6 +77,16 @@ GtAwsLambdaFunction >> name: anObject [
 ]
 
 { #category : #accessing }
+GtAwsLambdaFunction >> printOn: aStream [
+	super printOn: aStream.
+
+	aStream
+		nextPut: $(;
+		nextPutAll: self name;
+		nextPut: $)
+]
+
+{ #category : #accessing }
 GtAwsLambdaFunction >> refreshTags [
 	^ tags := self client lambdaListFunctionTagsFor: self arn
 ]

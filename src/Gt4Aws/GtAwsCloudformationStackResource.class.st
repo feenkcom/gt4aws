@@ -117,6 +117,13 @@ GtAwsCloudformationStackResource >> resourceObject [
 ]
 
 { #category : #accessing }
+GtAwsCloudformationStackResource >> resourceObjectOrNil [
+	^ [ self resourceClass lookup: self physicalResourceId inClient: self client ]
+		on: Error
+		do: [ nil ]
+]
+
+{ #category : #accessing }
 GtAwsCloudformationStackResource >> resourceType [
 	^ resourceType
 ]

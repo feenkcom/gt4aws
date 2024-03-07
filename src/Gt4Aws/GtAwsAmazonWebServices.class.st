@@ -910,3 +910,23 @@ GtAwsAmazonWebServices >> sqsGetQueueAttributes: aQueueId [
 		url: aQueueId;
 		attributes: ((STONJSON fromString: proc stdout) at: 'Attributes')
 ]
+
+{ #category : #accessing }
+GtAwsAmazonWebServices >> sqsListQueueTagsFor: aUrl [
+	| proc |
+	proc := GtSubprocessWithInMemoryOutput
+			command: self awsExecutable
+			arguments: {'sqs'.
+					'list-queue-tags'.
+					'--queue-url'.
+					aUrl}.
+	proc
+		retryCount: retryCount;
+		addAllEnvVariablesFromParentWithoutOverride;
+		setDefaultErrorBlock.
+	monitor critical: [ proc runAndWait ].
+
+	^ proc stdout
+		ifEmpty: [ Dictionary new ]
+		ifNotEmpty: [ (STONJSON fromString: proc stdout) at: 'Tags' ]
+]
