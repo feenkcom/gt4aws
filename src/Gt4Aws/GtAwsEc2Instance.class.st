@@ -54,6 +54,11 @@ GtAwsEc2Instance >> lookupInCloudFormation [
 ]
 
 { #category : #accessing }
+GtAwsEc2Instance >> managementConsoleProperties [
+	^ 'InstanceDetails:instanceId=', self id
+]
+
+{ #category : #accessing }
 GtAwsEc2Instance >> tagAt: aName [
 	^ (self jsonObject at: 'Tags')
 		detect: [ :aTag | (aTag at: 'Key') = aName ]
@@ -68,4 +73,9 @@ GtAwsEc2Instance >> type [
 { #category : #accessing }
 GtAwsEc2Instance >> type: anObject [
 	type := anObject
+]
+
+{ #category : #accessing }
+GtAwsEc2Instance >> urlBaseName [
+	^ 'ec2'
 ]

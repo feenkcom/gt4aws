@@ -67,6 +67,11 @@ GtAwsLambdaFunction >> lookupInCloudFormation [
 ]
 
 { #category : #accessing }
+GtAwsLambdaFunction >> managementConsoleProperties [
+	^ '/functions/', self name
+]
+
+{ #category : #accessing }
 GtAwsLambdaFunction >> name [
 	^ name
 ]
@@ -109,6 +114,11 @@ GtAwsLambdaFunction >> tagAt: aName [
 { #category : #accessing }
 GtAwsLambdaFunction >> tags [
 	^ tags ifNil: [ self refreshTags ]
+]
+
+{ #category : #accessing }
+GtAwsLambdaFunction >> urlBaseName [
+	^ 'lambda'
 ]
 
 { #category : #accessing }

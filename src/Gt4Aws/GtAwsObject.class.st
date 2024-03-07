@@ -65,6 +65,15 @@ GtAwsObject >> gtLookupInCloudFormationActionFor: anAction [
 ]
 
 { #category : #accessing }
+GtAwsObject >> gtManagementConsoleFor: anAction [
+	<gtAction>
+	^ anAction button
+		icon: BrGlamorousVectorIcons window;
+		tooltip: 'Open in ManagementConsole';
+		action: [ :aButton | WebBrowser openOn: self managementConsoleUrl ]
+]
+
+{ #category : #accessing }
 GtAwsObject >> gtRawInfoFor: aView [
 	<gtView>
 
@@ -95,6 +104,23 @@ GtAwsObject >> lookupInCloudFormation [
 ]
 
 { #category : #accessing }
+GtAwsObject >> managementConsoleProperties [
+	^ self subclassResponsibility
+]
+
+{ #category : #accessing }
+GtAwsObject >> managementConsoleUrl [
+	^ 'https://' , self client awsRegion , '.console.aws.amazon.com/'
+		, self urlBaseName , '/home?region=' , self client awsRegion , '#'
+		, self managementConsoleProperties
+]
+
+{ #category : #accessing }
 GtAwsObject >> tagAt: aName [
+	^ self subclassResponsibility
+]
+
+{ #category : #accessing }
+GtAwsObject >> urlBaseName [
 	^ self subclassResponsibility
 ]

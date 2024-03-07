@@ -40,6 +40,11 @@ GtAwsSQSQueue >> gtAttributesFor: aView [
 ]
 
 { #category : #accessing }
+GtAwsSQSQueue >> managementConsoleProperties [
+	^ '/queues/', self url urlEncoded
+]
+
+{ #category : #accessing }
 GtAwsSQSQueue >> printOn: aStream [
 	super printOn: aStream.
 
@@ -72,4 +77,9 @@ GtAwsSQSQueue >> url [
 { #category : #accessing }
 GtAwsSQSQueue >> url: anObject [
 	url := anObject
+]
+
+{ #category : #accessing }
+GtAwsSQSQueue >> urlBaseName [
+	^ 'sqs'
 ]

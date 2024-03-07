@@ -25,6 +25,11 @@ GtAwsS3Bucket >> lookupInCloudFormation [
 ]
 
 { #category : #accessing }
+GtAwsS3Bucket >> managementConsoleUrl [
+	^ 'https://s3.console.aws.amazon.com/s3/buckets/', self name
+]
+
+{ #category : #accessing }
 GtAwsS3Bucket >> modifiedAt [
 	^ modifiedAt
 ]
