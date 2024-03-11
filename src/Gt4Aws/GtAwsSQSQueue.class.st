@@ -61,7 +61,7 @@ GtAwsSQSQueue >> refreshTags [
 
 { #category : #accessing }
 GtAwsSQSQueue >> tagAt: aName [
-	self tags at: aName
+	^ self tags at: aName
 ]
 
 { #category : #accessing }
