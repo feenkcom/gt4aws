@@ -1,31 +1,47 @@
 Class {
 	#name : #GtAwsCloudFormationStackElement,
-	#superclass : #BrHorizontalGrid,
+	#superclass : #BrVerticalPane,
 	#instVars : [
 		'stack',
-		'label'
+		'label',
+		'grid'
 	],
 	#category : #'Gt4Aws-Elements'
 }
 
 { #category : #accessing }
+GtAwsCloudFormationStackElement >> grid [
+	^ grid
+]
+
+{ #category : #accessing }
+GtAwsCloudFormationStackElement >> grid: anObject [
+	grid := anObject
+]
+
+{ #category : #accessing }
 GtAwsCloudFormationStackElement >> initialize [
 	super initialize.
-
-	self fitContent.
-	self columnCount: 3.
 	
+	self fitContent.
 	self padding: (BlInsets all: 5).
 
 	self initializeLabel.
+	self initializeGrid.
 
-	self addChild: self label as: #label
+	self addChild: self label as: #label.
+	self addChild: self grid as: #grid
 ]
 
 { #category : #accessing }
 GtAwsCloudFormationStackElement >> initializeBorder [
 	self
 		border: (BlBorder paint: (GtAwsStatus forName: self stack status) foregroundColor width: 3)
+]
+
+{ #category : #accessing }
+GtAwsCloudFormationStackElement >> initializeGrid [
+	grid := BrHorizontalGrid new fitContent columnCount: 2
 ]
 
 { #category : #accessing }
@@ -70,6 +86,17 @@ GtAwsCloudFormationStackElement >> updateLabel [
 
 { #category : #accessing }
 GtAwsCloudFormationStackElement >> updateResources [
+	self grid removeChildren.
 	self stack resources
-		do: [ :aResource | self addChild: (GtAwsCloudFormationStackResourceElement new resource: aResource) ]
+		do: [ :aResource | 
+			self grid
+				addChild: (GtAwsCloudFormationStackResourceElement new
+						resource: aResource;
+						margin: (BlInsets
+								top: 5
+								bottom: 5
+								left: 0
+								right: 5);
+						when: BlClickEvent
+							do: [ :anEvent | anEvent target phlow spawnObject: aResource ]) ]
 ]

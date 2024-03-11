@@ -79,9 +79,7 @@ GtAwsCloudformationStack >> gtGraphFor: aView [
 	^ aView explicit
 		title: 'Graph';
 		priority: 10;
-		stencil: [
-			GtAwsCloudFormationStackElement new stack: self
-		]
+		stencil: [ GtAwsCloudFormationStackElement new stack: self ]
 ]
 
 { #category : #accessing }

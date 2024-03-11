@@ -1,9 +1,10 @@
 Class {
 	#name : #GtAwsCloudFormationStackResourceElement,
-	#superclass : #BrFrame,
+	#superclass : #BrVerticalPane,
 	#instVars : [
 		'resource',
-		'label'
+		'label',
+		'name'
 	],
 	#category : #'Gt4Aws-Elements'
 }
@@ -16,8 +17,10 @@ GtAwsCloudFormationStackResourceElement >> initialize [
 	self padding: (BlInsets all: 5).
 
 	self initializeLabel.
+	self initializeName.
 
-	self addChild: self label as: #label
+	self addChild: self label as: #label.
+	self addChild: self name as: #name
 ]
 
 { #category : #accessing }
@@ -28,7 +31,14 @@ GtAwsCloudFormationStackResourceElement >> initializeBorder [
 
 { #category : #accessing }
 GtAwsCloudFormationStackResourceElement >> initializeLabel [
-	label := BrLabel new aptitude: BrGlamorousLabelAptitude
+	label := BrLabel new
+			aptitude: (BrGlamorousLabelAptitude new
+					foreground: BrGlamorousColors disabledHeaderTextColor)
+]
+
+{ #category : #accessing }
+GtAwsCloudFormationStackResourceElement >> initializeName [
+	name := BrLabel new aptitude: BrGlamorousLabelAptitude new
 ]
 
 { #category : #accessing }
@@ -42,10 +52,21 @@ GtAwsCloudFormationStackResourceElement >> label: anObject [
 ]
 
 { #category : #accessing }
+GtAwsCloudFormationStackResourceElement >> name [
+	^ name
+]
+
+{ #category : #accessing }
+GtAwsCloudFormationStackResourceElement >> name: anObject [
+	name := anObject
+]
+
+{ #category : #accessing }
 GtAwsCloudFormationStackResourceElement >> onResourceUpdated [
 	self initializeBorder.
 
-	self updateLabel
+	self updateLabel.
+	self updateName
 ]
 
 { #category : #accessing }
@@ -62,6 +83,10 @@ GtAwsCloudFormationStackResourceElement >> resource: anObject [
 
 { #category : #accessing }
 GtAwsCloudFormationStackResourceElement >> updateLabel [
-	self label
-		text: self resource resourceType , ' (' , self resource logicalResourceId , ')'
+	self label text: self resource resourceType
+]
+
+{ #category : #accessing }
+GtAwsCloudFormationStackResourceElement >> updateName [
+	self name text: self resource logicalResourceId
 ]
