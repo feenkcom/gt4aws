@@ -137,6 +137,11 @@ GtAwsCloudformationStack >> id: anObject [
 ]
 
 { #category : #accessing }
+GtAwsCloudformationStack >> isActive [
+	^ self isDeleted not
+]
+
+{ #category : #accessing }
 GtAwsCloudformationStack >> isDeleted [
 	^ self status = 'DELETE_COMPLETE'
 ]

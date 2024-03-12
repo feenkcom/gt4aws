@@ -125,7 +125,8 @@ GtAwsCloudFormation >> gtStacksFor: aView [
 GtAwsCloudFormation >> latestStacks [
 	^ GtAwsCloudformationStackGroup
 		withAll: ((self stacks groupedBy: #name) values
-				collect: [ :aList | aList detectMax: #lastTouched ])
+				collect: [ :aList | aList detectMax: #lastTouched ]
+				thenSelect: #isActive)
 ]
 
 { #category : #'gt - extensions' }
