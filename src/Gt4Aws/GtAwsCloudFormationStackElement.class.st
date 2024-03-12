@@ -87,16 +87,14 @@ GtAwsCloudFormationStackElement >> updateLabel [
 { #category : #accessing }
 GtAwsCloudFormationStackElement >> updateResources [
 	self grid removeChildren.
-	self stack resources
-		do: [ :aResource | 
+	(self stack resources groupedBy: #resourceTypeGroup)
+		do: [ :aResourceGroup | 
 			self grid
-				addChild: (GtAwsCloudFormationStackResourceElement new
-						resource: aResource;
+				addChild: (GtAwsCloudFormationStackResourceGroupElement new
+						resourceGroup: aResourceGroup;
 						margin: (BlInsets
 								top: 5
 								bottom: 5
 								left: 0
-								right: 5);
-						when: BlClickEvent
-							do: [ :anEvent | anEvent target phlow spawnObject: aResource ]) ]
+								right: 5)) ]
 ]

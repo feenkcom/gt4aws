@@ -66,7 +66,8 @@ GtAwsCloudFormationStackResourceElement >> onResourceUpdated [
 	self initializeBorder.
 
 	self updateLabel.
-	self updateName
+	self updateName.
+	self updateClickHandler
 ]
 
 { #category : #accessing }
@@ -82,11 +83,21 @@ GtAwsCloudFormationStackResourceElement >> resource: anObject [
 ]
 
 { #category : #accessing }
+GtAwsCloudFormationStackResourceElement >> updateClickHandler [
+	self
+		when: BlClickEvent
+		do: [ :anEvent | anEvent target phlow spawnObject: self resource ]
+]
+
+{ #category : #accessing }
 GtAwsCloudFormationStackResourceElement >> updateLabel [
 	self label text: self resource resourceType
 ]
 
 { #category : #accessing }
 GtAwsCloudFormationStackResourceElement >> updateName [
-	self name text: self resource logicalResourceId
+	self name
+		text: (String
+				printStringLimitedTo: 50
+				using: [ :s | s nextPutAll: self resource physicalResourceId ])
 ]

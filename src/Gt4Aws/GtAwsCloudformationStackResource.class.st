@@ -134,6 +134,11 @@ GtAwsCloudformationStackResource >> resourceType: anObject [
 ]
 
 { #category : #accessing }
+GtAwsCloudformationStackResource >> resourceTypeGroup [
+	^ ('::' split: self resourceType) second
+]
+
+{ #category : #accessing }
 GtAwsCloudformationStackResource >> stack [
 	^ stack
 ]
