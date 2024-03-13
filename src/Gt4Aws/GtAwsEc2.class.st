@@ -2,7 +2,8 @@ Class {
 	#name : #GtAwsEc2,
 	#superclass : #Object,
 	#instVars : [
-		'client'
+		'client',
+		'instances'
 	],
 	#category : #'Gt4Aws-Model'
 }
@@ -28,11 +29,38 @@ GtAwsEc2 >> gtInstancesFor: aView [
 ]
 
 { #category : #accessing }
+GtAwsEc2 >> gtRefreshInstancesFor: anAction [
+	<gtAction>
+	^ anAction button
+		priority: 1;
+		tooltip: 'Refresh instances';
+		icon: BrGlamorousVectorIcons refresh;
+		action: [ self refreshInstances ]
+]
+
+{ #category : #accessing }
+GtAwsEc2 >> gtSearchInstancesFor: aSearch [
+	<gtSearch>
+	^ aSearch list
+		title: 'Instances';
+		priority: 30;
+		items: [ self instances ];
+		itemsLimit: Float infinity;
+		itemName: #id;
+		filterBySubstring
+]
+
+{ #category : #accessing }
 GtAwsEc2 >> instances [
-	^ self client ec2ListInstances
+	^ instances ifNil: [ self refreshInstances ]
 ]
 
 { #category : #accessing }
 GtAwsEc2 >> printOn: aStream [
 	aStream nextPutAll: 'AWS Elastic Compute Cloud'
+]
+
+{ #category : #accessing }
+GtAwsEc2 >> refreshInstances [
+	^ instances := self client ec2ListInstances
 ]
