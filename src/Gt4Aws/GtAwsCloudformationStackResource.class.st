@@ -8,7 +8,8 @@ Class {
 		'lastUpdated',
 		'status',
 		'driftInformation',
-		'stack'
+		'stack',
+		'resourceObject'
 	],
 	#category : #'Gt4Aws-Model'
 }
@@ -113,7 +114,10 @@ GtAwsCloudformationStackResource >> resourceClass [
 
 { #category : #accessing }
 GtAwsCloudformationStackResource >> resourceObject [
-	^ self resourceClass lookup: self physicalResourceId inClient: self client
+	^ resourceObject
+		ifNil: [ resourceObject := self resourceClass
+					lookup: self physicalResourceId
+					inClient: self client ]
 ]
 
 { #category : #accessing }

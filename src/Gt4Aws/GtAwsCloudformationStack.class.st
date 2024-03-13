@@ -74,15 +74,6 @@ GtAwsCloudformationStack >> driftInformation: anObject [
 ]
 
 { #category : #accessing }
-GtAwsCloudformationStack >> gtGraphFor: aView [
-	<gtView>
-	^ aView explicit
-		title: 'Graph';
-		priority: 10;
-		stencil: [ GtAwsCloudFormationStackElement new stack: self ]
-]
-
-{ #category : #accessing }
 GtAwsCloudformationStack >> gtRefreshResourcesFor: anAction [
 	<gtAction>
 	^ anAction button
