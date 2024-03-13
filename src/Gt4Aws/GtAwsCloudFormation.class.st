@@ -75,10 +75,11 @@ GtAwsCloudFormation >> gtRefreshStacksFor: anAction [
 GtAwsCloudFormation >> gtResourceTreeFor: aView [
 	<gtView>
 	client ifNil: [ ^ aView empty ].
+
 	^ aView columnedTree
 		title: 'Resource tree';
 		priority: 10;
-		items: [ self stacks ];
+		items: [ self latestStacks ];
 		children: #treeChildren;
 		column: 'Type' text: #treeType width: 200;
 		column: 'ID' text: #treeId;
