@@ -1,66 +1,35 @@
 Class {
 	#name : #GtAwsEc2,
-	#superclass : #Object,
-	#instVars : [
-		'client',
-		'instances'
-	],
+	#superclass : #GtAwsEntityHolder,
 	#category : #'Gt4Aws-Model'
 }
 
 { #category : #accessing }
-GtAwsEc2 >> client [
-	^ client
+GtAwsEc2 >> entityId [
+	^ 'AWS::EC2::Instance'
 ]
 
 { #category : #accessing }
-GtAwsEc2 >> client: anObject [
-	client := anObject
+GtAwsEc2 >> entityName [
+	^ 'Instances'
 ]
 
 { #category : #accessing }
-GtAwsEc2 >> gtInstancesFor: aView [
-	<gtView>
-	^ aView forward
-		title: 'Instances';
-		priority: 1;
-		object: [ self instances ];
-		view: #gtInstancesFor:
+GtAwsEc2 >> entitySearchKey [
+	^ #id
 ]
 
 { #category : #accessing }
-GtAwsEc2 >> gtRefreshInstancesFor: anAction [
-	<gtAction>
-	^ anAction button
-		priority: 1;
-		tooltip: 'Refresh instances';
-		icon: BrGlamorousVectorIcons refresh;
-		action: [ self refreshInstances ]
+GtAwsEc2 >> refreshEntities [
+	^ self client ec2ListInstances
 ]
 
 { #category : #accessing }
-GtAwsEc2 >> gtSearchInstancesFor: aSearch [
-	<gtSearch>
-	^ aSearch list
-		title: 'Instances';
-		priority: 30;
-		items: [ self instances ];
-		itemsLimit: Float infinity;
-		itemName: #id;
-		filterBySubstring
+GtAwsEc2 >> serviceName [
+	^ 'AWS Elastic Compute Cloud'
 ]
 
 { #category : #accessing }
-GtAwsEc2 >> instances [
-	^ instances ifNil: [ self refreshInstances ]
-]
-
-{ #category : #accessing }
-GtAwsEc2 >> printOn: aStream [
-	aStream nextPutAll: 'AWS Elastic Compute Cloud'
-]
-
-{ #category : #accessing }
-GtAwsEc2 >> refreshInstances [
-	^ instances := self client ec2ListInstances
+GtAwsEc2 >> viewName [
+	^ #gtInstancesFor:
 ]

@@ -1,37 +1,30 @@
 Class {
 	#name : #GtAwsEks,
-	#superclass : #Object,
-	#instVars : [
-		'client'
-	],
+	#superclass : #GtAwsEntityHolder,
 	#category : #'Gt4Aws-Model'
 }
 
 { #category : #accessing }
-GtAwsEks >> client [
-	^ client
+GtAwsEks >> entityId [
+	^ 'AWS::EKS::Cluster'
 ]
 
 { #category : #accessing }
-GtAwsEks >> client: anObject [
-	client := anObject
+GtAwsEks >> entityName [
+	^ 'Clusters'
 ]
 
 { #category : #accessing }
-GtAwsEks >> clusters [
+GtAwsEks >> refreshEntities [
 	^ self client eksListClusters
 ]
 
 { #category : #accessing }
-GtAwsEks >> gtListClustersFor: aView [
-	<gtView>
-	^ aView list
-		title: 'Clusters';
-		priority: 1;
-		items: [ self clusters ]
+GtAwsEks >> serviceName [
+	^ 'AWS Elastic Kubernetes Service'
 ]
 
 { #category : #accessing }
-GtAwsEks >> printOn: aStream [
-	aStream nextPutAll: 'AWS Elastic Kubernetes Service'
+GtAwsEks >> viewName [
+	^ #gtLiveFor:
 ]

@@ -1,37 +1,30 @@
 Class {
 	#name : #GtAwsEfs,
-	#superclass : #Object,
-	#instVars : [
-		'client'
-	],
+	#superclass : #GtAwsEntityHolder,
 	#category : #'Gt4Aws-Model'
 }
 
 { #category : #accessing }
-GtAwsEfs >> client [
-	^ client
+GtAwsEfs >> entityId [
+	^ 'AWS::EFS::FileSystem'
 ]
 
 { #category : #accessing }
-GtAwsEfs >> client: anObject [
-	client := anObject
+GtAwsEfs >> entityName [
+	^ 'File systems'
 ]
 
 { #category : #accessing }
-GtAwsEfs >> filesystems [
+GtAwsEfs >> refreshEntities [
 	^ self client efsListFileSystems
 ]
 
 { #category : #accessing }
-GtAwsEfs >> gtListFileSystemsFor: aView [
-	<gtView>
-	^ aView list
-		title: 'File systems';
-		priority: 1;
-		items: [ self filesystems ]
+GtAwsEfs >> serviceName [
+	^ 'AWS Elastic File System'
 ]
 
 { #category : #accessing }
-GtAwsEfs >> printOn: aStream [
-	^ aStream nextPutAll: 'AWS Elastic File System'
+GtAwsEfs >> viewName [
+	^ #gtLiveFor:
 ]

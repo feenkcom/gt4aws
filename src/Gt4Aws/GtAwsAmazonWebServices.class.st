@@ -6,7 +6,8 @@ Class {
 		'awsRegion',
 		'instanceTypes',
 		'retryCount',
-		'cloudformation'
+		'cloudformation',
+		'entityHolders'
 	],
 	#classInstVars : [
 		'uniqueInstance'
@@ -242,7 +243,7 @@ GtAwsAmazonWebServices >> deleteAllInS3Url: s3Url [
 
 { #category : #'gt - extensions' }
 GtAwsAmazonWebServices >> ec2 [
-	^ GtAwsEc2 new client: self
+	^ entityHolders at: 'EC2' ifAbsentPut: [ GtAwsEc2 new client: self ]
 ]
 
 { #category : #accessing }
@@ -330,7 +331,7 @@ GtAwsAmazonWebServices >> ec2ListInstances [
 
 { #category : #'gt - extensions' }
 GtAwsAmazonWebServices >> efs [
-	^ GtAwsEfs new client: self
+	^ entityHolders at: 'EFS' ifAbsentPut: [ GtAwsEfs new client: self ]
 ]
 
 { #category : #accessing }
@@ -354,7 +355,7 @@ GtAwsAmazonWebServices >> efsListFileSystems [
 
 { #category : #'gt - extensions' }
 GtAwsAmazonWebServices >> eks [
-	^ GtAwsEks new client: self
+	^ entityHolders at: 'EKS' ifAbsentPut: [ GtAwsEks new client: self ]
 ]
 
 { #category : #accessing }
@@ -387,6 +388,16 @@ GtAwsAmazonWebServices >> emitAwsCommandStartedSignalWithArguments: anArray [
 		arguments: anArray;
 		retryCount: retryCount;
 		executableName: self awsExecutable) emit
+]
+
+{ #category : #'as yet unclassified' }
+GtAwsAmazonWebServices >> find: aResourceType orFind: anId InEndpoint: anEndpoint [
+	entityHolders
+		valuesDo: [ :anEntityHolder | 
+			anEntityHolder entityId = aResourceType
+				ifTrue: [ (anEntityHolder findEntityWithId: anId) ifNotNil: [ :anEntity | ^ anEntity ] ] ].
+
+	^ self perform: anEndpoint withArguments: {anId}
 ]
 
 { #category : #accessing }
@@ -469,6 +480,7 @@ GtAwsAmazonWebServices >> initialize [
 	monitor := Mutex new.
 	awsRegion := 'us-east-1'.
 	retryCount := 3.
+	entityHolders := Dictionary new
 ]
 
 { #category : #accessing }
@@ -493,7 +505,7 @@ GtAwsAmazonWebServices >> instanceTypes [
 
 { #category : #'gt - extensions' }
 GtAwsAmazonWebServices >> lambda [
-	^ GtAwsLambda new client: self
+	^ entityHolders at: 'Lambda' ifAbsentPut: [ GtAwsLambda new client: self ]
 ]
 
 { #category : #accessing }
@@ -601,7 +613,7 @@ GtAwsAmazonWebServices >> putParameterNamed: nameString value: valueString [
 
 { #category : #'gt - extensions' }
 GtAwsAmazonWebServices >> rds [
-	^ GtAwsRds new client: self
+	^ entityHolders at: 'RDS' ifAbsentPut: [ GtAwsRds new client: self ]
 ]
 
 { #category : #accessing }
@@ -687,7 +699,7 @@ GtAwsAmazonWebServices >> runArguments: anArray returnBlock: aBlockOrNil retryCo
 
 { #category : #'gt - extensions' }
 GtAwsAmazonWebServices >> s3 [
-	^ GtAwsS3 new client: self
+	^entityHolders at: 'S3' ifAbsentPut: [  GtAwsS3 new client: self]
 ]
 
 { #category : #accessing }

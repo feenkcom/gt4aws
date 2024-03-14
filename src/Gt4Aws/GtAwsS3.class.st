@@ -1,66 +1,30 @@
 Class {
 	#name : #GtAwsS3,
-	#superclass : #Object,
-	#instVars : [
-		'client',
-		'buckets'
-	],
+	#superclass : #GtAwsEntityHolder,
 	#category : #'Gt4Aws-Model'
 }
 
 { #category : #accessing }
-GtAwsS3 >> buckets [
-	^ buckets ifNil: [ self refreshBuckets ]
+GtAwsS3 >> entityId [
+	^ 'AWS::S3::Bucket'
 ]
 
 { #category : #accessing }
-GtAwsS3 >> client [
-	^ client
+GtAwsS3 >> entityName [
+	^ 'Buckets'
 ]
 
 { #category : #accessing }
-GtAwsS3 >> client: anObject [
-	client := anObject
+GtAwsS3 >> refreshEntities [
+	^ self client s3Ls
 ]
 
 { #category : #accessing }
-GtAwsS3 >> gtBucketsFor: aView [
-	<gtView>
-	^ aView forward
-		title: 'Buckets';
-		priority: 1;
-		object: [ self buckets ];
-		view: #gtBucketsFor:
+GtAwsS3 >> serviceName [
+	^ 'AWS Simple Storage Service'
 ]
 
 { #category : #accessing }
-GtAwsS3 >> gtRefreshBucketsFor: anAction [
-	<gtAction>
-	^ anAction button
-		priority: 1;
-		tooltip: 'Refresh buckets';
-		icon: BrGlamorousVectorIcons refresh;
-		action: [ self refreshBuckets ]
-]
-
-{ #category : #accessing }
-GtAwsS3 >> gtSearchBucketsFor: aSearch [
-	<gtSearch>
-		^ aSearch list
-		title: 'Buckets';
-		priority: 30;
-		items: [ self buckets ];
-		itemsLimit: Float infinity;
-		itemName: #name;
-		filterBySubstring
-]
-
-{ #category : #accessing }
-GtAwsS3 >> printOn: aStream [
-	aStream nextPutAll: 'AWS Simple Storage Service'
-]
-
-{ #category : #accessing }
-GtAwsS3 >> refreshBuckets [
-	^ buckets := self client s3Ls
+GtAwsS3 >> viewName [
+	^ #gtBucketsFor:
 ]

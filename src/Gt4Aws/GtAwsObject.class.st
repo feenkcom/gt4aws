@@ -31,7 +31,7 @@ GtAwsObject class >> jsonObject: aJsonObject [
 
 { #category : #accessing }
 GtAwsObject class >> lookup: anId inClient: aClient [
-	^ aClient perform: self lookupEndpoint withArguments: {anId}
+	^ aClient find: self resourceType orFind: anId InEndpoint: self lookupEndpoint
 ]
 
 { #category : #accessing }
