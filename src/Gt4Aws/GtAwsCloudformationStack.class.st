@@ -10,7 +10,8 @@ Class {
 		'deleted',
 		'templateDescription',
 		'driftInformation',
-		'resources'
+		'resources',
+		'resourceError'
 	],
 	#category : #'Gt4Aws-Model'
 }
@@ -93,6 +94,18 @@ GtAwsCloudformationStack >> gtSearchResourcesFor: aSearch [
 		itemsLimit: Float infinity;
 		itemName: #logicalResourceId;
 		filterBySubstring
+]
+
+{ #category : #accessing }
+GtAwsCloudformationStack >> gtViewResourceErrorFor: aView [
+	<gtView>
+	resourceError ifNil: [ ^ aView empty ].
+
+	^ aView forward
+		title: 'Resource error';
+		priority: 1;
+		object: [ resourceError ];
+		view: #gtMessageTextFor:
 ]
 
 { #category : #accessing }
@@ -180,9 +193,12 @@ GtAwsCloudformationStack >> printOn: aStream [
 
 { #category : #accessing }
 GtAwsCloudformationStack >> refreshResources [
-	^ resources := GtAwsCloudFormationStackResourceGroup
-			withAll: ((self client cloudformationListStackResourcesFor: self id)
-					collect: [ :aResource | aResource stack: self ])
+	^ [ resources := (self client cloudformationListStackResourcesFor: self id)
+			collect: [ :aResource | aResource stack: self ] ]
+		on: Error
+		do: [ :anError | 
+			resourceError := anError.
+			resources := GtAwsCloudFormationStackResourceGroup withAll: {} ]
 ]
 
 { #category : #accessing }
