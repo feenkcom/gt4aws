@@ -40,6 +40,17 @@ GtAwsSQSQueue >> gtAttributesFor: aView [
 ]
 
 { #category : #accessing }
+GtAwsSQSQueue >> gtTagsFor: aView [
+	<gtView>
+	^ aView columnedList
+		title: 'Tags';
+		priority: 5;
+		items: [ self tags associations ];
+		column: 'Name' text: #key;
+		column: 'Value' text: #value
+]
+
+{ #category : #accessing }
 GtAwsSQSQueue >> managementConsoleProperties [
 	^ '/queues/', self url urlEncoded
 ]

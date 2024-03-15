@@ -20,6 +20,17 @@ GtAwsS3Bucket class >> resourceType [
 ]
 
 { #category : #accessing }
+GtAwsS3Bucket >> gtTagsFor: aView [
+	<gtView>
+	^ aView columnedList
+		title: 'Tags';
+		priority: 5;
+		items: [ self tags associations ];
+		column: 'Name' text: #key;
+		column: 'Value' text: #value
+]
+
+{ #category : #accessing }
 GtAwsS3Bucket >> lookupInCloudFormation [
 	^ self client cloudformation lookupObject: self name
 ]

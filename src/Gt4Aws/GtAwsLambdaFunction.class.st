@@ -62,6 +62,17 @@ GtAwsLambdaFunction >> description: anObject [
 ]
 
 { #category : #accessing }
+GtAwsLambdaFunction >> gtTagsFor: aView [
+	<gtView>
+	^ aView columnedList
+		title: 'Tags';
+		priority: 5;
+		items: [ self tags associations ];
+		column: 'Name' text: #key;
+		column: 'Value' text: #value
+]
+
+{ #category : #accessing }
 GtAwsLambdaFunction >> lookupInCloudFormation [
 	^ self client cloudformation lookupObject: self name
 ]

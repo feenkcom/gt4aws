@@ -29,6 +29,17 @@ GtAwsEc2Instance class >> resourceType [
 ]
 
 { #category : #accessing }
+GtAwsEc2Instance >> gtTagsFor: aView [
+	<gtView>
+	^ aView columnedList
+		title: 'Tags';
+		priority: 5;
+		items: [ self jsonObject at: 'Tags' ];
+		column: 'Name' text: [ :aTag | aTag at: 'Key' ];
+		column: 'Value' text: [ :aTag | aTag at: 'Value' ]
+]
+
+{ #category : #accessing }
 GtAwsEc2Instance >> id [
 	^ id
 ]

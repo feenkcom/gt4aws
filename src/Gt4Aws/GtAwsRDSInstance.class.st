@@ -31,6 +31,17 @@ GtAwsRDSInstance class >> resourceType [
 ]
 
 { #category : #accessing }
+GtAwsRDSInstance >> gtTagsFor: aView [
+	<gtView>
+	^ aView columnedList
+		title: 'TagList';
+		priority: 5;
+		items: [ self jsonObject at: 'Tags' ];
+		column: 'Name' text: [ :aTag | aTag at: 'Key' ];
+		column: 'Value' text: [ :aTag | aTag at: 'Value' ]
+]
+
+{ #category : #accessing }
 GtAwsRDSInstance >> id [
 	^ id
 ]
