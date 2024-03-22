@@ -10,7 +10,7 @@ GtAwsServiceGroup >> gtServicesFor: aView [
 	^ aView columnedList
 		title: 'Services';
 		priority: 1;
-		items: [ self items ];
+		items: [ self items sorted: #name ascending ];
 		column: 'Name' text: #name width: 250;
 		column: '# of operations' text: [:aService | aService operations size] width: 100;
 		column: 'Documentation' text: #documentation

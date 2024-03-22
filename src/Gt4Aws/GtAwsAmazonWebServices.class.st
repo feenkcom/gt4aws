@@ -667,11 +667,14 @@ GtAwsAmazonWebServices >> retryCount: anInteger [
 { #category : #private }
 GtAwsAmazonWebServices >> runArguments: anArray returnBlock: aBlockOrNil [
 	"Run the aws cli with the supplied arguments and process stdout with aBlock"
-	| proc |
-	
+	| proc arguments |
+
+	arguments := awsRegion
+		ifNil: [ anArray ]
+		ifNotNil: [ anArray, { '--region'. awsRegion } ].
 	proc := GtSubprocessWithInMemoryOutput
 		command: self awsExecutable
-		arguments: anArray.
+		arguments: arguments.
 	proc
 		retryCount: retryCount;
 		addAllEnvVariablesFromParentWithoutOverride;

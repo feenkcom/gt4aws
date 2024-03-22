@@ -4,10 +4,21 @@ Class {
 	#instVars : [
 		'service',
 		'operation',
-		'zone'
+		'zone',
+		'argumentsArray'
 	],
 	#category : #'Gt4Aws-Executor'
 }
+
+{ #category : #accessing }
+GtAwsOperationExecutor >> argumentsArray [
+	^ argumentsArray
+]
+
+{ #category : #accessing }
+GtAwsOperationExecutor >> argumentsArray: anObject [
+	argumentsArray := anObject
+]
 
 { #category : #accessing }
 GtAwsOperationExecutor >> deserialize: anObject [

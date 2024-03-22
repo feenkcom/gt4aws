@@ -97,6 +97,16 @@ GtAwsService >> performOperation: anOperation inZone: aZone [
 ]
 
 { #category : #accessing }
+GtAwsService >> performOperation: anOperation inZone: aZone withArguments: anArray [
+	^ self operationExecutor new
+		service: self;
+		operation: (self operationAt: anOperation);
+		argumentsArray: anArray;
+		zone: aZone;
+		run
+]
+
+{ #category : #accessing }
 GtAwsService >> printOn: aStream [
 	super printOn: aStream.
 

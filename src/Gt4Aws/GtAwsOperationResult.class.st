@@ -12,6 +12,20 @@ Class {
 }
 
 { #category : #accessing }
+GtAwsOperationResult >> at: keyString [
+
+	^ self result at: keyString
+]
+
+{ #category : #accessing }
+GtAwsOperationResult >> atPath: aCollection [
+
+	^ aCollection
+		  inject: self
+		  into: [ :aResult :anIndex | aResult at: anIndex ]
+]
+
+{ #category : #accessing }
 GtAwsOperationResult >> children [
 	| aTypeDescription |
 	aTypeDescription := self typeDescription.
@@ -62,10 +76,10 @@ GtAwsOperationResult >> gtDescriptionFor: aView [
 ]
 
 { #category : #accessing }
-GtAwsOperationResult >> gtRawFor: aView [
+GtAwsOperationResult >> gtResultFor: aView [
 	<gtView>
 	^ aView forward
-		title: 'Raw';
+		title: 'Result';
 		priority: 5;
 		object: [ self result ];
 		view: #gtLiveFor:

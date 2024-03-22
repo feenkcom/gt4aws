@@ -7,8 +7,7 @@ Class {
 { #category : #accessing }
 GtAwsCliExecutor >> execute [
 	^ (GtAwsAmazonWebServices default
-		awsRegion: self zone;
-		setRegion: self zone)
+		awsRegion: self zone)
 		runArguments: self operationToArguments
 		returnBlock: #stdout
 		retryCount: 3
@@ -19,6 +18,9 @@ GtAwsCliExecutor >> operationToArguments [
 	| mangledOperationName |
 	mangledOperationName := '-'
 			join: ((self operation at: 'name') splitCamelCase collect: #asLowercase).
-	^ {self service endpointPrefix.
-		mangledOperationName}
+	^ Array streamContents: [ :stream |
+		stream
+			nextPut: self service endpointPrefix;
+			nextPut: mangledOperationName;
+			nextPutAll: (argumentsArray ifNil: [ #() ]) ]
 ]

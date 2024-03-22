@@ -20,10 +20,11 @@ GtAwsServicesImporter >> gtServiceFilesFor: aView [
 GtAwsServicesImporter >> import [
 	^ GtAwsServiceGroup
 		withAll: (self serviceFiles
-				collect: [ :aFile | 
-					GtAwsServiceImporter new
-						serviceFile: aFile;
-						import ])
+			select: #exists
+			thenCollect: [ :aFile | 
+				GtAwsServiceImporter new
+					serviceFile: aFile;
+					import ])
 ]
 
 { #category : #accessing }
