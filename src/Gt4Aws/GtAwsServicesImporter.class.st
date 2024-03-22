@@ -7,6 +7,27 @@ Class {
 	#category : #'Gt4Aws-Importer'
 }
 
+{ #category : #private }
+GtAwsServicesImporter class >> cloneBotocore [
+
+	IceRepositoryCreator
+		fromUrl: 'https://github.com/boto/botocore.git'
+		to: 'botocore' asFileReference.
+]
+
+{ #category : #private }
+GtAwsServicesImporter class >> services [
+	| botocoreDirectory serviceFiles |
+
+	botocoreDirectory := 'botocore' asFileReference.
+	botocoreDirectory exists ifFalse: [ self cloneBotocore ].
+	serviceFiles := (botocoreDirectory / 'botocore' / 'data') directories
+			collect: [ :aChild | aChild children first / 'service-2.json' ].
+	^ self new 
+		serviceFiles: serviceFiles;
+		import.
+]
+
 { #category : #accessing }
 GtAwsServicesImporter >> gtServiceFilesFor: aView [
 	<gtView>
