@@ -166,6 +166,39 @@ GtAwsAmazonWebServices >> awsRegion: aString [
 	awsRegion := aString.
 ]
 
+{ #category : #accessing }
+GtAwsAmazonWebServices >> cloudWatchWeeklyCpuDataFor: anInstanceId [
+	| proc endTime startTime |
+	endTime := DateAndTime now.
+	startTime := endTime - 7 days.
+	proc := GtSubprocessWithInMemoryOutput
+			command: self awsExecutable
+			arguments: {'cloudwatch'.
+					'get-metric-statistics'.
+					'--namespace'.
+					'AWS/EC2'.
+					'--period'.
+					'600'.
+					'--start-time'.
+					startTime asString.
+					'--end-time'.
+					endTime asString.
+					'--metric-name'.
+					'CPUUtilization'.
+					'--statistics'.
+					'Maximum'.
+					'--dimensions'.
+					'Name = InstanceId, Value = ' , anInstanceId}.
+	proc
+		retryCount: retryCount;
+		addAllEnvVariablesFromParentWithoutOverride;
+		setDefaultErrorBlock.
+	monitor critical: [ proc runAndWait ].
+	^ GtAwsCloudWatchMaximumDataPointGroup
+		withAll: ((((STONJSON fromString: proc stdout) at: 'Datapoints')
+				collect: [ :aDict | (GtAwsCloudwatchMaximumDataPoint fromDictionary: aDict) client: self ]) sorted: [:a :b| a timestamp < b timestamp])
+]
+
 { #category : #cloudformation }
 GtAwsAmazonWebServices >> cloudformation [
 	"Model and provision all your cloud infrastructure"

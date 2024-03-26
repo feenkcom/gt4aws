@@ -29,6 +29,11 @@ GtAwsEc2Instance class >> resourceType [
 ]
 
 { #category : #accessing }
+GtAwsEc2Instance >> cpuUsage [
+	^ self client cloudWatchWeeklyCpuDataFor: self id
+]
+
+{ #category : #accessing }
 GtAwsEc2Instance >> gtTagsFor: aView [
 	<gtView>
 	^ aView columnedList
@@ -37,6 +42,16 @@ GtAwsEc2Instance >> gtTagsFor: aView [
 		items: [ self jsonObject at: 'Tags' ];
 		column: 'Name' text: [ :aTag | aTag at: 'Key' ];
 		column: 'Value' text: [ :aTag | aTag at: 'Value' ]
+]
+
+{ #category : #accessing }
+GtAwsEc2Instance >> gtViewCpuUsageFor: aView [
+	<gtView>
+	^ aView forward
+		title: 'CPU usage';
+		priority: 5;
+		object: [ self cpuUsage ];
+		view: #gtViewSparklineFor:
 ]
 
 { #category : #accessing }
