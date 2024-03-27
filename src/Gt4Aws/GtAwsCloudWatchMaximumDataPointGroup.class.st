@@ -5,6 +5,11 @@ Class {
 }
 
 { #category : #accessing }
+GtAwsCloudWatchMaximumDataPointGroup >> average [
+	^ (self items collect: #maximum) average
+]
+
+{ #category : #accessing }
 GtAwsCloudWatchMaximumDataPointGroup >> gtViewCpuFor: aView [
 	<gtView>
 	^ aView columnedList

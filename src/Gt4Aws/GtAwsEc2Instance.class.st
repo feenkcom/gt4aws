@@ -4,7 +4,8 @@ Class {
 	#instVars : [
 		'id',
 		'type',
-		'launchTime'
+		'launchTime',
+		'cpuUsage'
 	],
 	#category : #'Gt4Aws-Model'
 }
@@ -30,7 +31,8 @@ GtAwsEc2Instance class >> resourceType [
 
 { #category : #accessing }
 GtAwsEc2Instance >> cpuUsage [
-	^ self client cloudWatchWeeklyCpuDataFor: self id
+	^ cpuUsage
+		ifNil: [ cpuUsage := self client cloudWatchWeeklyCpuDataFor: self id ]
 ]
 
 { #category : #accessing }
