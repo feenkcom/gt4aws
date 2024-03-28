@@ -38,6 +38,23 @@ GtAwsService >> file: anObject [
 	file := anObject
 ]
 
+{ #category : #actions }
+GtAwsService >> getCommandFinalStatus: commandId instanceId: instanceId wait: waitDuration inZone: aZone [
+	"Wait for the specified command to complete and return the status"
+	| status |
+
+	[ status := self performOperation: 'GetCommandInvocation' 
+		inZone: aZone
+		withArguments: {
+			'--command-id'.
+			commandId.
+			'--instance-id'.
+			instanceId. }.
+	(status at: 'Status') = 'InProgress' ] whileTrue:
+		[ waitDuration wait ].
+	^ status
+]
+
 { #category : #accessing }
 GtAwsService >> gtRawFor: aView [
 	<gtView>
