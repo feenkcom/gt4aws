@@ -1,6 +1,9 @@
 Class {
 	#name : #GtAwsInstanceType,
 	#superclass : #GtAwsObject,
+	#classVars : [
+		'CoreCountCorrections'
+	],
 	#category : #'Gt4Aws-Model'
 }
 
@@ -10,12 +13,14 @@ GtAwsInstanceType class >> coreCountCorrections [
 		instanceType -> coreCount
 	for known errors in the AWS values"
 
-	^ CoreCountCorrections ifNil: [ CoreCountCorrections :=
-		{ 'm6a.32xlarge' -> 32.
+	^ CoreCountCorrections ifNil: [ CoreCountCorrections := {
+		'm6a.32xlarge' -> 32.
+		'm6a.48xlarge' -> 48.
 		'm6id.24xlarge' -> 24.
 		'm6i.24xlarge' -> 24.
 		'm6i.32xlarge' -> 32.
 		'r7a.32xlarge' -> 64.
+		'r7iz.32xlarge' -> 32.
 		} asDictionary ]
 ]
 
