@@ -66,7 +66,7 @@ GtAwsOperationResult >> gtDescriptionFor: aView [
 	<gtView>
 	^ aView columnedTree
 		title: 'Description';
-		priority: 1;
+		priority: 10;
 		items: [ {self} ];
 		children: #children;
 		column: 'Key' text: #key width: 150;

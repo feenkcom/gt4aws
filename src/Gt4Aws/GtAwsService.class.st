@@ -40,9 +40,12 @@ GtAwsService >> file: anObject [
 
 { #category : #actions }
 GtAwsService >> getCommandFinalStatus: commandId instanceId: instanceId wait: waitDuration inZone: aZone [
-	"Wait for the specified command to complete and return the status"
-	| status |
+	"Wait for the specified command to complete and return the status.
+	Currently a maximum execution time of 5 minutes is allowed before signalling an error.  This is completely arbitrary and requires further thought."
+	| status maxExecutionTime startTime |
 
+	maxExecutionTime := 5 minutes.
+	startTime := DateAndTime now.
 	[ status := self performOperation: 'GetCommandInvocation' 
 		inZone: aZone
 		withArguments: {
@@ -50,9 +53,25 @@ GtAwsService >> getCommandFinalStatus: commandId instanceId: instanceId wait: wa
 			commandId.
 			'--instance-id'.
 			instanceId. }.
-	(status at: 'Status') = 'InProgress' ] whileTrue:
+	(status at: 'Status') = 'InProgress' and:
+		[ (DateAndTime now - startTime) < maxExecutionTime ] ] whileTrue:
 		[ waitDuration wait ].
+	(status at: 'Status') = 'InProgress' ifTrue:
+		[ self error: 'Remote execution exceeded allowed time' ].
 	^ status
+]
+
+{ #category : #actions }
+GtAwsService >> getCommandStatus: commandId instanceId: instanceId inZone: aZone [
+	"Wait for the specified command to complete and return the status"
+
+	^ self performOperation: 'GetCommandInvocation' 
+		inZone: aZone
+		withArguments: {
+			'--command-id'.
+			commandId.
+			'--instance-id'.
+			instanceId. }.
 ]
 
 { #category : #accessing }
