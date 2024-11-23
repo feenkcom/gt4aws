@@ -28,7 +28,7 @@ GtAwsInstanceType class >> coreCountCorrections [
 { #category : #accessing }
 GtAwsInstanceType >> coreCount [
 
-	^ (jsonObject at: #VCpuInfo) at: #DefaultCores
+	^ (jsonObject at: 'VCpuInfo') at: 'DefaultCores'
 ]
 
 { #category : #accessing }
@@ -43,7 +43,7 @@ GtAwsInstanceType >> correctedCoreCount [
 { #category : #accessing }
 GtAwsInstanceType >> instanceType [
 
-	^ jsonObject at: #InstanceType
+	^ jsonObject at: 'InstanceType'
 ]
 
 { #category : #accessing }
@@ -51,4 +51,9 @@ GtAwsInstanceType >> printOn: aStream [
 
 	jsonObject ifNil: [ ^ super printOn: aStream ].
 	aStream << self instanceType
+]
+
+{ #category : #accessing }
+GtAwsInstanceType >> totalMemory [
+	^ ((jsonObject at: 'MemoryInfo') at: 'SizeInMiB') * 1024 * 1024
 ]
