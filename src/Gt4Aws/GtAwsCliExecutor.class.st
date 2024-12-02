@@ -17,7 +17,7 @@ GtAwsCliExecutor >> execute [
 GtAwsCliExecutor >> operationToArguments [
 	| mangledOperationName |
 	mangledOperationName := '-'
-			join: ((self operation at: 'name') splitCamelCase collect: #asLowercase).
+			join: ((self operation name) splitCamelCase collect: #asLowercase).
 	^ Array streamContents: [ :stream |
 		stream
 			nextPut: self service endpointPrefix;

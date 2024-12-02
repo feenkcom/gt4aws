@@ -26,32 +26,6 @@ GtAwsOperationResult >> atPath: aCollection [
 ]
 
 { #category : #accessing }
-GtAwsOperationResult >> children [
-	| aTypeDescription |
-	aTypeDescription := self typeDescription.
-
-	(aTypeDescription at: 'type') = 'list'
-		ifTrue: [ ^ self result
-				collect: [ :anEntity | 
-					GtAwsOperationResult new
-						result: anEntity;
-						resultType: (aTypeDescription at: 'member' at: 'shape');
-						types: self types ] ].
-
-	(aTypeDescription at: 'type') = 'structure'
-		ifTrue: [ ^ (aTypeDescription at: 'members') associations
-				collect: [ :aPair | 
-					GtAwsOperationResult new
-						key: aPair key;
-						result: (self result at: aPair key ifAbsent: [ nil ]);
-						resultType: (aPair value at: 'shape');
-						documentation: (aPair value at: 'documentation');
-						types: self types ] ].
-
-	^ {}
-]
-
-{ #category : #accessing }
 GtAwsOperationResult >> documentation [
 	^ documentation
 ]
@@ -64,15 +38,11 @@ GtAwsOperationResult >> documentation: anObject [
 { #category : #accessing }
 GtAwsOperationResult >> gtDescriptionFor: aView [
 	<gtView>
-	^ aView columnedTree
+	^ aView forward
 		title: 'Description';
 		priority: 10;
-		items: [ {self} ];
-		children: #children;
-		column: 'Key' text: #key width: 150;
-		column: 'Documentation' text: #documentation;
-		column: 'Type' text: #resultType width: 180;
-		expandUpTo: 2
+		object: [ self resultType ];
+		view: #gtMembersFor:
 ]
 
 { #category : #accessing }
