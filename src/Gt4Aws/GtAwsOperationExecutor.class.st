@@ -25,7 +25,7 @@ GtAwsOperationExecutor >> deserialize: anObject [
 	^ GtAwsOperationResult new
 		key: 'Response';
 		result: (STONJSON fromString: anObject);
-		resultType: (self operation at: 'output' at: 'shape');
+		resultType: (self operation output);
 		types: self service shapes
 ]
 

@@ -4,7 +4,9 @@ Class {
 	#instVars : [
 		'file',
 		'rawData',
-		'operationExecutor'
+		'operationExecutor',
+		'operations',
+		'shapes'
 	],
 	#category : #'Gt4Aws-Importer'
 }
@@ -75,20 +77,64 @@ GtAwsService >> getCommandStatus: commandId instanceId: instanceId inZone: aZone
 			instanceId. }.
 ]
 
-{ #category : #accessing }
-GtAwsService >> gtRawFor: aView [
+{ #category : #'as yet unclassified' }
+GtAwsService >> gtDocumentationFor: aView [
+	<gtView>
+	^ aView textEditor
+		title: 'Documentation';
+		priority: 8;
+		text: [ self documentation ]
+]
+
+{ #category : #'as yet unclassified' }
+GtAwsService >> gtMetaDataFor: aView [
 	<gtView>
 	^ aView forward
-		title: 'Raw';
+		title: 'Meta data';
 		priority: 5;
+		object: [ self metadata ];
+		view: #gtItemsFor:
+]
+
+{ #category : #'as yet unclassified' }
+GtAwsService >> gtOperationsFor: aView [
+	<gtView>
+	^ aView columnedList
+		title: 'Operations';
+		priority: 1;
+		items: [ self operations values ];
+		column: 'Name' text: #name;
+		column: 'Documentation' text: #documentation
+]
+
+{ #category : #accessing }
+GtAwsService >> gtRawDataFor: aView [
+	<gtView>
+	^ aView forward
+		title: 'Raw data';
+		priority: 10;
 		object: [ self rawData ];
 		view: #gtLiveFor:
+]
+
+{ #category : #'as yet unclassified' }
+GtAwsService >> gtShapesFor: aView [
+	<gtView>
+	^ aView columnedList
+		title: 'Shapes';
+		priority: 2;
+		items: [ self shapes values ];
+		column: 'Name' text: #name;
+		column: 'Documentation' text: #documentation
 ]
 
 { #category : #accessing }
 GtAwsService >> initialize [
 	super initialize.
-	
+
+	self shapes: Dictionary new.
+	self operations: Dictionary new.
+
 	self operationExecutor: self defaultOperationExecutor
 ]
 
@@ -103,10 +149,25 @@ GtAwsService >> name [
 ]
 
 { #category : #accessing }
+GtAwsService >> onRawDataSupplied [
+	(self rawData at: 'shapes') associations
+		do: [ :aPair | 
+			(self shapeAt: aPair key)
+				service: self;
+				rawData: aPair value ].
+
+	self
+		operations: ((self rawData at: 'operations') associations
+				collect: [ :aPair | 
+					aPair key
+						-> (GtAwsOperation new
+								service: self;
+								rawData: aPair value) ]) asDictionary
+]
+
+{ #category : #accessing }
 GtAwsService >> operationAt: aString [
-	^ self operations
-		detect: [ :anOperation | (anOperation at: 'name') = aString ]
-		ifNone: [ self error: 'No operation named ' , aString , ' found' ]
+	^ self operations at: aString
 ]
 
 { #category : #accessing }
@@ -121,7 +182,12 @@ GtAwsService >> operationExecutor: anObject [
 
 { #category : #accessing }
 GtAwsService >> operations [
-	^ self rawData at: 'operations'
+	^ operations
+]
+
+{ #category : #accessing }
+GtAwsService >> operations: anObject [
+	operations := anObject
 ]
 
 { #category : #accessing }
@@ -160,7 +226,9 @@ GtAwsService >> rawData [
 
 { #category : #accessing }
 GtAwsService >> rawData: anObject [
-	rawData := anObject
+	rawData := anObject.
+	
+	self onRawDataSupplied
 ]
 
 { #category : #accessing }
@@ -168,9 +236,19 @@ GtAwsService >> serviceId [
 	^ self metadata at: 'serviceId'
 ]
 
+{ #category : #'as yet unclassified' }
+GtAwsService >> shapeAt: aString [
+	^ self shapes at: aString ifAbsentPut: [ GtAwsShape new name: aString ]
+]
+
 { #category : #accessing }
 GtAwsService >> shapes [
-	^ self rawData at: 'shapes'
+	^ shapes
+]
+
+{ #category : #accessing }
+GtAwsService >> shapes: anObject [
+	shapes := anObject
 ]
 
 { #category : #accessing }
