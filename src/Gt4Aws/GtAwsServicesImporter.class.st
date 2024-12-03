@@ -16,6 +16,17 @@ GtAwsServicesImporter class >> cloneBotocore [
 ]
 
 { #category : #private }
+GtAwsServicesImporter class >> onBotocore [
+	| serviceFiles |
+	self cloneBotocore.
+
+	serviceFiles := ('botocore' asFileReference / 'botocore' / 'data') directories
+			collect: [ :aChild | aChild children first / 'service-2.json' ].
+
+	^ self new serviceFiles: serviceFiles
+]
+
+{ #category : #private }
 GtAwsServicesImporter class >> services [
 	| botocoreDirectory serviceFiles |
 
