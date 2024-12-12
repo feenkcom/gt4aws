@@ -92,3 +92,12 @@ GtAwsAutoScalingGroupDescription >> preTerminatingCount [
 	^ ((jsonObject at: #Instances) reject: [ :each | 
 		#(#Terminating #Terminated) includes: (each at: #LifecycleState) ]) size.
 ]
+
+{ #category : #accessing }
+GtAwsAutoScalingGroupDescription >> weightInService [
+	"Answer the number of cores currently available."
+
+	^ self instancesInService
+		inject: 0
+		into: [ :s :v | s + v weight ].
+]
