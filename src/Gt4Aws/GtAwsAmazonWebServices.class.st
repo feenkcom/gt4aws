@@ -2,25 +2,15 @@ Class {
 	#name : #GtAwsAmazonWebServices,
 	#superclass : #Object,
 	#instVars : [
-		'monitor',
-		'instanceTypes',
-		'retryCount',
 		'cloudformation',
-		'entityHolders'
+		'entityHolders',
+		'client'
 	],
 	#classInstVars : [
 		'uniqueInstance'
 	],
 	#category : #'Gt4Aws-Client'
 }
-
-{ #category : #accessing }
-GtAwsAmazonWebServices class >> awsExecutable [
-
-	^ OSPlatform current isWindows
-		ifTrue: [ 'aws.exe' ]
-		ifFalse: [ '/usr/local/bin/aws' ].
-]
 
 { #category : #testing }
 GtAwsAmazonWebServices class >> cleanUniqueInstance [
@@ -43,146 +33,24 @@ GtAwsAmazonWebServices class >> uniqueInstance [
 	^ uniqueInstance ifNil: [ uniqueInstance := self new ]
 ]
 
-{ #category : #private }
-GtAwsAmazonWebServices >> autoScalingGroupDescriptionFor: groupName [
-	"Answer the full description of the specified auto-scaling group"
-
-	^ self runArguments: (Array
-				with: 'autoscaling'
-				with: 'describe-auto-scaling-groups'
-				with: '--auto-scaling-group-name'
-				with: groupName)
-		returnBlock: [ :proc | STONJSON fromString: proc stdout ]
-		retryCount: retryCount.
+{ #category : #accessing }
+GtAwsAmazonWebServices >> client [
+	^ client
 ]
 
 { #category : #accessing }
-GtAwsAmazonWebServices >> autoScalingGroupRunningCountIn: groupName [
-	"Answer the number of machines currently running in the specified group"
-
-	^ self runArguments: (Array
-				with: 'autoscaling'
-				with: 'describe-auto-scaling-instances'
-				with: '--query'
-				with: 'length(AutoScalingInstances[?AutoScalingGroupName==''', groupName, '''])')
-		returnBlock: [ :proc | proc stdout asIntegerNumber ]
-		retryCount: retryCount.
-]
-
-{ #category : #accessing }
-GtAwsAmazonWebServices >> autoScalingGroupScheduledActionsCountIn: groupName [
-	"Answer the number of machines currently running in the specified group"
-
-	^ self runArguments: (Array
-				with: 'autoscaling'
-				with: 'describe-scheduled-actions'
-				with: '--auto-scaling-group-name'
-				with: groupName
-				with: '--query'
-				with: 'length(ScheduledUpdateGroupActions)')
-		returnBlock: [ :proc | proc stdout asIntegerNumber ]
-		retryCount: retryCount.
-]
-
-{ #category : #accessing }
-GtAwsAmazonWebServices >> autoscalingGroup: groupName createOrUpdateTagAt: keyString put: valueString [
-
-	keyString size > 128 ifTrue:
-		[ self error: 'AWS Tag keys must be <= 128 unicode characters' ].
-	valueString size > 256 ifTrue:
-		[ self error: 'AWS Tag values must be <= 256 unicode characters' ].
-	self runArguments: (Array
-			with: 'autoscaling'
-			with: 'create-or-update-tags'
-			with: '--tags'
-			with: 'ResourceId=', groupName, 
-				',ResourceType=auto-scaling-group,Key=', keyString,
-				',Value=', valueString,
-				',PropagateAtLaunch=true')
-		returnBlock: nil
-		retryCount: retryCount.
-]
-
-{ #category : #accessing }
-GtAwsAmazonWebServices >> autoscalingGroup: groupName setDesiredCapacity: desiredSize min: minSize max: maxSize [
-
-	self runArguments: {
-				'autoscaling'.
-				'update-auto-scaling-group'.
-				'--auto-scaling-group-name'.
-				groupName.
-				'--min-size'.
-				minSize displayString.
-				'--max-size'.
-				maxSize displayString.
-				'--desired-capacity'.
-				desiredSize displayString.
-				}
-		returnBlock: nil
-		retryCount: retryCount.
-]
-
-{ #category : #accessing }
-GtAwsAmazonWebServices >> autoscalingGroup: groupName setTimelimit: timeoutTime [
-	"Set the timeout for the specified group.
-	timeoutTime is an ISO8601 format string."
-
-	self runArguments: {
-				'autoscaling'.
-				'put-scheduled-update-group-action'.
-				'--auto-scaling-group-name'.
-				groupName.
-				'--scheduled-action-name'.
-				'set-time-limit-for-workers'.
-				'--start-time'.
-				timeoutTime.
-				'--min-size'.
-				'0'.
-				'--max-size'.
-				'0'.
-				'--desired-capacity'.
-				'0'.
-				}
-		returnBlock: nil
-		retryCount: retryCount.
-]
-
-{ #category : #accessing }
-GtAwsAmazonWebServices >> awsExecutable [
-
-	^ self class awsExecutable
-]
-
-{ #category : #accessing }
-GtAwsAmazonWebServices >> awsProfile [
-	^ awsProfile
-]
-
-{ #category : #accessing }
-GtAwsAmazonWebServices >> awsProfile: anObject [
-	awsProfile := anObject
-]
-
-{ #category : #accessing }
-GtAwsAmazonWebServices >> awsRegion [
-
-	^ awsRegion
-]
-
-{ #category : #accessing }
-GtAwsAmazonWebServices >> awsRegion: aString [
-
-	awsRegion := aString.
+GtAwsAmazonWebServices >> client: anObject [
+	client := anObject
 ]
 
 { #category : #accessing }
 GtAwsAmazonWebServices >> cloudWatchWeeklyCpuDataFor: anInstanceId [
-	| proc endTime startTime |
+	| endTime startTime output |
 	endTime := DateAndTime now.
 	startTime := endTime - 7 days.
-	proc := GtSubprocessWithInMemoryOutput
-			command: self awsExecutable
-			arguments: {'cloudwatch'.
+
+	output := self client
+			run: {'cloudwatch'.
 					'get-metric-statistics'.
 					'--namespace'.
 					'AWS/EC2'.
@@ -198,14 +66,11 @@ GtAwsAmazonWebServices >> cloudWatchWeeklyCpuDataFor: anInstanceId [
 					'Maximum'.
 					'--dimensions'.
 					'Name = InstanceId, Value = ' , anInstanceId}.
-	proc
-		retryCount: retryCount;
-		addAllEnvVariablesFromParentWithoutOverride;
-		setDefaultErrorBlock.
-	monitor critical: [ proc runAndWait ].
+
 	^ GtAwsCloudWatchMaximumDataPointGroup
-		withAll: ((((STONJSON fromString: proc stdout) at: 'Datapoints')
-				collect: [ :aDict | (GtAwsCloudwatchMaximumDataPoint fromDictionary: aDict) client: self ]) sorted: [:a :b| a timestamp < b timestamp])
+		withAll: ((((STONJSON fromString: output) at: 'Datapoints')
+				collect: [ :aDict | (GtAwsCloudwatchMaximumDataPoint fromDictionary: aDict) client: self ])
+				sorted: [ :a :b | a timestamp < b timestamp ])
 ]
 
 { #category : #cloudformation }
@@ -221,36 +86,29 @@ GtAwsAmazonWebServices >> cloudformation [
 
 { #category : #accessing }
 GtAwsAmazonWebServices >> cloudformationListStackResourcesFor: aStackId [
-	| proc |
-	proc := GtSubprocessWithInMemoryOutput
-			command: self awsExecutable
-			arguments: {'cloudformation'.
-					'list-stack-resources'.
-					'--stack-name'.
-					aStackId}.
-	proc
-		retryCount: retryCount;
-		addAllEnvVariablesFromParentWithoutOverride;
-		setDefaultErrorBlock.
-	monitor critical: [ proc runAndWait ].
+	| output |
+	output := self client
+			run: (GtAwsCliArguments new
+					endpointPrefix: 'cloudformation';
+					operation: 'list-stack-resources';
+					add: {GtAwsCliArgument new
+								key: 'stack-name';
+								value: aStackId}).
+
 	^ GtAwsCloudFormationStackResourceGroup
-		withAll: (((STONJSON fromString: proc stdout) at: 'StackResourceSummaries')
+		withAll: (((STONJSON fromString: output) at: 'StackResourceSummaries')
 				collect: [ :aDict | (GtAwsCloudformationStackResource fromDictionary: aDict) client: self ])
 ]
 
 { #category : #accessing }
 GtAwsAmazonWebServices >> cloudformationListStacks [
-	| proc aCollection |
-	proc := GtSubprocessWithInMemoryOutput
-			command: self awsExecutable
-			arguments: {'cloudformation'.
-					'list-stacks'}.
-	proc
-		retryCount: retryCount;
-		addAllEnvVariablesFromParentWithoutOverride;
-		setDefaultErrorBlock.
-	monitor critical: [ proc runAndWait ].
-	aCollection := ((STONJSON fromString: proc stdout) at: 'StackSummaries')
+	| output aCollection |
+	output := self client
+			run: (GtAwsCliArguments new
+					endpointPrefix: 'cloudformation';
+					operation: 'list-stacks').
+
+	aCollection := ((STONJSON fromString: output) at: 'StackSummaries')
 			collect: [ :aDict | (GtAwsCloudformationStack fromDictionary: aDict) client: self ].
 
 	^ GtAwsCloudformationStackGroup withAll: aCollection
@@ -259,28 +117,15 @@ GtAwsAmazonWebServices >> cloudformationListStacks [
 { #category : #accessing }
 GtAwsAmazonWebServices >> deleteAllInS3Url: s3Url [
 	"Remove all the entries in the specified S3 bucket"
-	| arguments proc |
 
-	arguments := Array
-		with: 's3'
-		with: 'rm'
-		with: s3Url
-		with: '--recursive'
-		with: '--exclude'
-		with: ''.
-	proc := GtSubprocessWithInMemoryOutput
-		command: self awsExecutable
-		arguments: arguments.
-	proc
-		addAllEnvVariablesFromParentWithoutOverride;
-		environmentAt: 'AWS_REGION' put: self awsRegion;
-		retryCount: retryCount;
-		setDefaultErrorBlock.
-	
-	monitor critical: [ 
-		self emitAwsCommandStartedSignalWithArguments: arguments.
-		[ proc runAndWait ] ensure: [
-			self emitAwsCommandEndedSignal  ] ].
+	self client
+		run: (GtAwsCliArguments new
+				endpointPrefix: 's3';
+				operation: 'rm';
+				add: (GtAwsCliFlag new name: 'recursive');
+				add: (GtAwsCliArgument new
+						key: 'exclude';
+						value: ''))
 ]
 
 { #category : #'gt - extensions' }
@@ -352,6 +197,26 @@ GtAwsAmazonWebServices >> ec2GetInstance: anId [
 ]
 
 { #category : #accessing }
+GtAwsAmazonWebServices >> ec2InstanceTypes [
+	"Answer a collection of the available instance types."
+
+	| typesArray output instanceTypes |
+	output := self client
+			run: (GtAwsCliArguments new
+					endpointPrefix: 'ec2';
+					operation: 'describe-instance-types').
+
+	typesArray := (STONJSON fromString: output trimBoth) at: #InstanceTypes.
+	instanceTypes := Dictionary new.
+	typesArray
+		do: [ :each | 
+			instanceTypes
+				at: (each at: #InstanceType)
+				put: (GtAwsInstanceType jsonObject: each) ].
+	^ instanceTypes
+]
+
+{ #category : #accessing }
 GtAwsAmazonWebServices >> ec2ListInstances [
 	| proc aCollection |
 	proc := GtSubprocessWithInMemoryOutput
@@ -417,19 +282,6 @@ GtAwsAmazonWebServices >> eksListClusters [
 			collect: [ :aDict | (GtAwsEksCluster fromDictionary: aDict) client: self ].
 
 	^ GtAwsEksClusterGroup withAll: aCollection
-]
-
-{ #category : #logging }
-GtAwsAmazonWebServices >> emitAwsCommandEndedSignal [
-	(GtAwsWebServiceCommandEndSignal new) emit
-]
-
-{ #category : #logging }
-GtAwsAmazonWebServices >> emitAwsCommandStartedSignalWithArguments: anArray [ 
-	(GtAwsWebServiceCommandStartSignal new 
-		arguments: anArray;
-		retryCount: retryCount;
-		executableName: self awsExecutable) emit
 ]
 
 { #category : #'as yet unclassified' }
@@ -519,30 +371,28 @@ GtAwsAmazonWebServices >> gtNavigations [
 GtAwsAmazonWebServices >> initialize [
 
 	super initialize.
-	monitor := Mutex new.
-	awsRegion := 'us-east-1'.
-	retryCount := 3.
-	entityHolders := Dictionary new
+	entityHolders := Dictionary new.
+	client := GtAwsClient new
 ]
 
 { #category : #accessing }
 GtAwsAmazonWebServices >> instanceTypes [
 	"Answer a collection of the available instance types."
-	instanceTypes ifNotNil: [^instanceTypes].
-	^self
-		runArguments: {'ec2'. 'describe-instance-types'.}
-		returnBlock: 
-			[:proc |
-			| typesArray |
-			typesArray := (STONJSON fromString: proc stdout trimBoth)
-						at: #InstanceTypes.
-			instanceTypes := Dictionary new.
-			typesArray do: 
-					[:each |
-					instanceTypes at: (each at: #InstanceType)
-						put: (GtAwsInstanceType jsonObject: each)].
-			instanceTypes]
-		retryCount: retryCount
+
+	| typesArray output instanceTypes |
+	output := self client
+			run: (GtAwsCliArguments new
+					endpointPrefix: 'ec2';
+					operation: 'describe-instance-types').
+
+	typesArray := (STONJSON fromString: output trimBoth) at: #InstanceTypes.
+	instanceTypes := Dictionary new.
+	typesArray
+		do: [ :each | 
+			instanceTypes
+				at: (each at: #InstanceType)
+				put: (GtAwsInstanceType jsonObject: each) ].
+	^ instanceTypes
 ]
 
 { #category : #'gt - extensions' }
@@ -704,38 +554,6 @@ GtAwsAmazonWebServices >> retryCount [
 { #category : #accessing }
 GtAwsAmazonWebServices >> retryCount: anInteger [
 	retryCount := anInteger
-]
-
-{ #category : #private }
-GtAwsAmazonWebServices >> runArguments: anArray returnBlock: aBlockOrNil [
-	"Run the aws cli with the supplied arguments and process stdout with aBlock"
-
-	| proc |
-	proc := GtSubprocessWithInMemoryOutput
-			command: self awsExecutable
-			arguments: anArray asAwsCli.
-	proc
-		retryCount: retryCount;
-		addAllEnvVariablesFromParentWithoutOverride;
-		setDefaultErrorBlock.
-	monitor
-		critical: [ self emitAwsCommandStartedSignalWithArguments: anArray.
-			[ proc runAndWait ] ensure: [ self emitAwsCommandEndedSignal ] ].
-
-	^ (aBlockOrNil ifNil: [ [ :p | p ] ]) value: proc
-]
-
-{ #category : #accessing }
-GtAwsAmazonWebServices >> runArguments: anArray returnBlock: aBlockOrNil retryCount: retryNumber [
-	| retriesLeft |
-
-	retriesLeft := retryNumber.
-	^ [ retriesLeft := retriesLeft - 1.
-		self runArguments: anArray returnBlock: aBlockOrNil ]
-			on: Error
-			do: [ :ex | retriesLeft > 0 
-				ifTrue: [ ex retry ]
-				ifFalse: [ ex pass ] ].
 ]
 
 { #category : #'gt - extensions' }

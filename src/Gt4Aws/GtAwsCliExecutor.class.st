@@ -6,10 +6,9 @@ Class {
 
 { #category : #accessing }
 GtAwsCliExecutor >> execute [
-	^ GtAwsAmazonWebServices default
+	^ GtAwsClient new
 		runArguments: self prepareOperation toArguments
 		returnBlock: #stdout
-		retryCount: 3
 ]
 
 { #category : #accessing }

@@ -8,7 +8,7 @@ Class {
 }
 
 { #category : #'as yet unclassified' }
-GtAwsCliFlag >> asCli [
+GtAwsCliFlag >> asAwsCli [
 	^ {'--' , self name}
 ]
 
@@ -18,7 +18,7 @@ GtAwsCliFlag >> gtCliFor: aView [
 	^ aView textEditor
 		title: 'CLI';
 		priority: 1;
-		text: [ ' ' join: self asCli ]
+		text: [ ' ' join: self asAwsCli ]
 ]
 
 { #category : #accessing }
@@ -33,5 +33,5 @@ GtAwsCliFlag >> name: anObject [
 
 { #category : #'as yet unclassified' }
 GtAwsCliFlag >> printOn: aStream [
-	aStream nextPutAll: (' ' join: self asCli)
+	aStream nextPutAll: (' ' join: self asAwsCli)
 ]

@@ -42,25 +42,26 @@ GtAwsExecutableOperation >> profile: anObject [
 
 { #category : #'as yet unclassified' }
 GtAwsExecutableOperation >> toArguments [
-	| mangledOperationName |
-	mangledOperationName := '-'
-			join: (self operation name splitCamelCase collect: #asLowercase).
-	^ Array
-		streamContents: [ :stream | 
-			stream
-				nextPut: self operation service endpointPrefix;
-				nextPut: mangledOperationName.
-			self profile
-				ifNotNil: [ :aProfile | 
-					stream
-						nextPut: '--profile';
-						nextPut: aProfile ].
-			self zone
-				ifNotNil: [ :aZone | 
-					stream
-						nextPut: '--region';
-						nextPut: aZone ].
-			stream nextPutAll: (self argumentsArray ifNil: [ #() ] ifNotNil: #asCli) ]
+	self argumentsArray ifNil: [ self argumentsArray: GtAwsCliArguments new ].
+
+	self argumentsArray
+		operation: ('-' join: (self operation name splitCamelCase collect: #asLowercase)).
+	self argumentsArray endpointPrefix: self operation service endpointPrefix.
+
+	self profile
+		ifNotNil: [ :aProfile | 
+			self argumentsArray
+				addFirst: (GtAwsCliArgument new
+						key: 'profile';
+						value: aProfile) ].
+	self zone
+		ifNotNil: [ :aZone | 
+			self argumentsArray
+				addFirst: (GtAwsCliArgument new
+						key: 'region';
+						value: aZone) ].
+	
+	^ self argumentsArray
 ]
 
 { #category : #accessing }
