@@ -6,9 +6,8 @@ Class {
 
 { #category : #accessing }
 GtAwsCliExecutor >> execute [
-	^ (GtAwsAmazonWebServices default
-		awsRegion: self zone)
-		runArguments: self operationToArguments
+	^ GtAwsAmazonWebServices default
+		runArguments: self prepareOperation toArguments
 		returnBlock: #stdout
 		retryCount: 3
 ]

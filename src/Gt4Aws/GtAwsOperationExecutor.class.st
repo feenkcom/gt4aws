@@ -2,10 +2,10 @@ Class {
 	#name : #GtAwsOperationExecutor,
 	#superclass : #Object,
 	#instVars : [
-		'service',
 		'operation',
 		'zone',
-		'argumentsArray'
+		'argumentsArray',
+		'profile'
 	],
 	#category : #'Gt4Aws-Executor'
 }
@@ -26,7 +26,7 @@ GtAwsOperationExecutor >> deserialize: anObject [
 		key: 'Response';
 		result: (STONJSON fromString: anObject);
 		resultType: (self operation output);
-		types: self service shapes
+		types: self operation service shapes
 ]
 
 { #category : #accessing }
@@ -42,6 +42,25 @@ GtAwsOperationExecutor >> operation [
 { #category : #accessing }
 GtAwsOperationExecutor >> operation: anObject [
 	operation := anObject
+]
+
+{ #category : #'as yet unclassified' }
+GtAwsOperationExecutor >> prepareOperation [
+	^ GtAwsExecutableOperation new
+		operation: self operation;
+		profile: self profile;
+		zone: self zone;
+		argumentsArray: self argumentsArray
+]
+
+{ #category : #accessing }
+GtAwsOperationExecutor >> profile [
+	^ profile
+]
+
+{ #category : #accessing }
+GtAwsOperationExecutor >> profile: anObject [
+	profile := anObject
 ]
 
 { #category : #accessing }
