@@ -9,7 +9,7 @@ Class {
 }
 
 { #category : #'as yet unclassified' }
-GtAwsCliArgument >> asCli [
+GtAwsCliArgument >> asAwsCli [
 	^ {'--', self key. self value}
 ]
 
@@ -19,7 +19,7 @@ GtAwsCliArgument >> gtCliFor: aView [
 	^ aView textEditor
 		title: 'CLI';
 		priority: 1;
-		text: [ ' ' join: self asCli ]
+		text: [ ' ' join: self asAwsCli ]
 ]
 
 { #category : #accessing }
@@ -34,7 +34,7 @@ GtAwsCliArgument >> key: anObject [
 
 { #category : #'as yet unclassified' }
 GtAwsCliArgument >> printOn: aStream [
-	aStream nextPutAll: (' ' join: self asCli)
+	aStream nextPutAll: (' ' join: self asAwsCli)
 ]
 
 { #category : #accessing }

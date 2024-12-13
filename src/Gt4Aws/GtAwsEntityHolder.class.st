@@ -3,19 +3,19 @@ Class {
 	#superclass : #Object,
 	#instVars : [
 		'entities',
-		'client'
+		'services'
 	],
 	#category : #'Gt4Aws-Model'
 }
 
 { #category : #accessing }
 GtAwsEntityHolder >> client [
-	^ client
+	^ services
 ]
 
 { #category : #accessing }
 GtAwsEntityHolder >> client: anObject [
-	client := anObject
+	services := anObject
 ]
 
 { #category : #accessing }
