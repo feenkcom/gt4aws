@@ -377,22 +377,7 @@ GtAwsAmazonWebServices >> initialize [
 
 { #category : #accessing }
 GtAwsAmazonWebServices >> instanceTypes [
-	"Answer a collection of the available instance types."
-
-	| typesArray output instanceTypes |
-	output := self client
-			run: (GtAwsCliArguments new
-					endpointPrefix: 'ec2';
-					operation: 'describe-instance-types').
-
-	typesArray := (STONJSON fromString: output trimBoth) at: #InstanceTypes.
-	instanceTypes := Dictionary new.
-	typesArray
-		do: [ :each | 
-			instanceTypes
-				at: (each at: #InstanceType)
-				put: (GtAwsInstanceType jsonObject: each) ].
-	^ instanceTypes
+	^  self ec2 instanceTypes
 ]
 
 { #category : #'gt - extensions' }
