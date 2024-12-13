@@ -3,7 +3,6 @@ Class {
 	#superclass : #Object,
 	#instVars : [
 		'monitor',
-		'awsRegion',
 		'instanceTypes',
 		'retryCount',
 		'cloudformation',
@@ -152,6 +151,16 @@ GtAwsAmazonWebServices >> autoscalingGroup: groupName setTimelimit: timeoutTime 
 GtAwsAmazonWebServices >> awsExecutable [
 
 	^ self class awsExecutable
+]
+
+{ #category : #accessing }
+GtAwsAmazonWebServices >> awsProfile [
+	^ awsProfile
+]
+
+{ #category : #accessing }
+GtAwsAmazonWebServices >> awsProfile: anObject [
+	awsProfile := anObject
 ]
 
 { #category : #accessing }
@@ -700,24 +709,20 @@ GtAwsAmazonWebServices >> retryCount: anInteger [
 { #category : #private }
 GtAwsAmazonWebServices >> runArguments: anArray returnBlock: aBlockOrNil [
 	"Run the aws cli with the supplied arguments and process stdout with aBlock"
-	| proc arguments |
 
-	arguments := awsRegion
-		ifNil: [ anArray ]
-		ifNotNil: [ anArray, { '--region'. awsRegion } ].
+	| proc |
 	proc := GtSubprocessWithInMemoryOutput
-		command: self awsExecutable
-		arguments: arguments.
+			command: self awsExecutable
+			arguments: anArray asAwsCli.
 	proc
 		retryCount: retryCount;
 		addAllEnvVariablesFromParentWithoutOverride;
 		setDefaultErrorBlock.
-	monitor critical: [ 
-		self emitAwsCommandStartedSignalWithArguments: anArray.
-		[ proc runAndWait ] ensure: [
-			self emitAwsCommandEndedSignal  ] ].
-	
-	^ (aBlockOrNil ifNil: [ [ :p | p ] ]) value: proc 
+	monitor
+		critical: [ self emitAwsCommandStartedSignalWithArguments: anArray.
+			[ proc runAndWait ] ensure: [ self emitAwsCommandEndedSignal ] ].
+
+	^ (aBlockOrNil ifNil: [ [ :p | p ] ]) value: proc
 ]
 
 { #category : #accessing }

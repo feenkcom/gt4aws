@@ -2,17 +2,20 @@ Class {
 	#name : #GtAwsServicesImporter,
 	#superclass : #Object,
 	#instVars : [
-		'serviceFiles'
+		'serviceFiles',
+		'profile',
+		'zone'
 	],
 	#category : #'Gt4Aws-Importer'
 }
 
 { #category : #private }
 GtAwsServicesImporter class >> cloneBotocore [
+	'botocore' asFileReference exists ifTrue: [ ^ self ].
 
 	IceRepositoryCreator
 		fromUrl: 'https://github.com/boto/botocore.git'
-		to: 'botocore' asFileReference.
+		to: 'botocore' asFileReference
 ]
 
 { #category : #private }
@@ -56,7 +59,19 @@ GtAwsServicesImporter >> import [
 			thenCollect: [ :aFile | 
 				GtAwsServiceImporter new
 					serviceFile: aFile;
+					profile: self profile;
+					zone: self zone;
 					import ])
+]
+
+{ #category : #accessing }
+GtAwsServicesImporter >> profile [
+	^ profile
+]
+
+{ #category : #accessing }
+GtAwsServicesImporter >> profile: anObject [
+	profile := anObject
 ]
 
 { #category : #accessing }
@@ -67,4 +82,14 @@ GtAwsServicesImporter >> serviceFiles [
 { #category : #accessing }
 GtAwsServicesImporter >> serviceFiles: anObject [
 	serviceFiles := anObject
+]
+
+{ #category : #accessing }
+GtAwsServicesImporter >> zone [
+	^ zone
+]
+
+{ #category : #accessing }
+GtAwsServicesImporter >> zone: anObject [
+	zone := anObject
 ]

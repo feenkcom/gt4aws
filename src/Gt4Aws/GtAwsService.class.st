@@ -6,7 +6,9 @@ Class {
 		'rawData',
 		'operationExecutor',
 		'operations',
-		'shapes'
+		'shapes',
+		'profile',
+		'zone'
 	],
 	#category : #'Gt4Aws-Importer'
 }
@@ -191,21 +193,40 @@ GtAwsService >> operations: anObject [
 ]
 
 { #category : #accessing }
+GtAwsService >> performOperation: anOperation [
+	^ self operationExecutor new
+		operation: (self operationAt: anOperation);
+		profile: self profile;
+		zone: self zone;
+		run
+]
+
+{ #category : #accessing }
 GtAwsService >> performOperation: anOperation inZone: aZone [
 	^ self operationExecutor new
-		service: self;
 		operation: (self operationAt: anOperation);
 		zone: aZone;
+		profile: self profile;
 		run
 ]
 
 { #category : #accessing }
 GtAwsService >> performOperation: anOperation inZone: aZone withArguments: anArray [
 	^ self operationExecutor new
-		service: self;
 		operation: (self operationAt: anOperation);
 		argumentsArray: anArray;
+		profile: self profile;
 		zone: aZone;
+		run
+]
+
+{ #category : #accessing }
+GtAwsService >> performOperation: anOperation withArguments: anArray [
+	^ self operationExecutor new
+		operation: (self operationAt: anOperation);
+		argumentsArray: anArray;
+		profile: self profile;
+		zone: self zone;
 		run
 ]
 
@@ -217,6 +238,16 @@ GtAwsService >> printOn: aStream [
 		nextPut: $(;
 		nextPutAll: self name;
 		nextPut: $)
+]
+
+{ #category : #accessing }
+GtAwsService >> profile [
+	^ profile
+]
+
+{ #category : #accessing }
+GtAwsService >> profile: anObject [
+	profile := anObject
 ]
 
 { #category : #accessing }
@@ -254,4 +285,14 @@ GtAwsService >> shapes: anObject [
 { #category : #accessing }
 GtAwsService >> version [
 	^ self rawData at: 'version'
+]
+
+{ #category : #accessing }
+GtAwsService >> zone [
+	^ zone
+]
+
+{ #category : #accessing }
+GtAwsService >> zone: anObject [
+	zone := anObject
 ]

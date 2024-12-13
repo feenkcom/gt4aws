@@ -2,7 +2,9 @@ Class {
 	#name : #GtAwsServiceImporter,
 	#superclass : #Object,
 	#instVars : [
-		'serviceFile'
+		'serviceFile',
+		'profile',
+		'zone'
 	],
 	#category : #'Gt4Aws-Importer'
 }
@@ -21,7 +23,19 @@ GtAwsServiceImporter >> gtServiceFileFor: aView [
 GtAwsServiceImporter >> import [
 	^ GtAwsService new
 		file: self serviceFile;
+		profile: self profile;
+		zone: self zone;
 		rawData: (STONJSON fromString: self serviceFile contents)
+]
+
+{ #category : #accessing }
+GtAwsServiceImporter >> profile [
+	^ profile
+]
+
+{ #category : #accessing }
+GtAwsServiceImporter >> profile: anObject [
+	profile := anObject
 ]
 
 { #category : #accessing }
@@ -32,4 +46,14 @@ GtAwsServiceImporter >> serviceFile [
 { #category : #accessing }
 GtAwsServiceImporter >> serviceFile: anObject [
 	serviceFile := anObject
+]
+
+{ #category : #accessing }
+GtAwsServiceImporter >> zone [
+	^ zone
+]
+
+{ #category : #accessing }
+GtAwsServiceImporter >> zone: anObject [
+	zone := anObject
 ]
