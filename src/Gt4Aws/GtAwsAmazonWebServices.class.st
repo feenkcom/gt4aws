@@ -278,7 +278,27 @@ GtAwsAmazonWebServices >> gtNavigations [
 		at: 'EC2' put: self ec2;
 		at: 'EKS' put: self eks;
 		at: 'EFS' put: self efs;
+		at: 'IAM' put: self iam;
 		yourself
+]
+
+{ #category : #'as yet unclassified' }
+GtAwsAmazonWebServices >> iam [
+	^ entityHolders at: 'IAM' ifAbsentPut: [ GtAwsIAM new client: self ]
+]
+
+{ #category : #accessing }
+GtAwsAmazonWebServices >> iamListRoles [
+	| output aCollection |
+	output := self client
+			run: (GtAwsCliArguments new
+					endpointPrefix: 'iam';
+					operation: 'list-roles').
+
+	aCollection := ((STONJSON fromString: output) at: 'Roles')
+			collect: [ :aDict | (GtAwsIAMRole fromDictionary: aDict) client: self ].
+
+	^ GtAwsIAMRoleGroup withAll: aCollection
 ]
 
 { #category : #accessing }

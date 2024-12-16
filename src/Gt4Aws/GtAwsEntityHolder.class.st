@@ -94,5 +94,5 @@ GtAwsEntityHolder >> serviceName [
 
 { #category : #accessing }
 GtAwsEntityHolder >> viewName [
-	^ self subclassResponsibility
+	^ #gtLiveFor:
 ]

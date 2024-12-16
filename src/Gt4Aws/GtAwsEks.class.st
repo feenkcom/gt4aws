@@ -23,8 +23,3 @@ GtAwsEks >> refreshEntities [
 GtAwsEks >> serviceName [
 	^ 'AWS Elastic Kubernetes Service'
 ]
-
-{ #category : #accessing }
-GtAwsEks >> viewName [
-	^ #gtLiveFor:
-]
