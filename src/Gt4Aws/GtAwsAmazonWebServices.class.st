@@ -375,11 +375,6 @@ GtAwsAmazonWebServices >> initialize [
 	client := GtAwsClient new
 ]
 
-{ #category : #accessing }
-GtAwsAmazonWebServices >> instanceTypes [
-	^  self ec2 instanceTypes
-]
-
 { #category : #'gt - extensions' }
 GtAwsAmazonWebServices >> lambda [
 	^ entityHolders at: 'Lambda' ifAbsentPut: [ GtAwsLambda new client: self ]
