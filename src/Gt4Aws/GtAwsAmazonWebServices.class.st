@@ -33,6 +33,14 @@ GtAwsAmazonWebServices class >> uniqueInstance [
 	^ uniqueInstance ifNil: [ uniqueInstance := self new ]
 ]
 
+{ #category : #'as yet unclassified' }
+GtAwsAmazonWebServices >> awsRegion [
+	^ self client
+		run: {'configure'.
+				'get'.
+				'region'}
+]
+
 { #category : #accessing }
 GtAwsAmazonWebServices >> client [
 	^ client
@@ -112,6 +120,16 @@ GtAwsAmazonWebServices >> cloudformationListStacks [
 			collect: [ :aDict | (GtAwsCloudformationStack fromDictionary: aDict) client: self ].
 
 	^ GtAwsCloudformationStackGroup withAll: aCollection
+]
+
+{ #category : #'as yet unclassified' }
+GtAwsAmazonWebServices >> defaultProfile: aString [
+	self client defaultProfile: aString
+]
+
+{ #category : #'as yet unclassified' }
+GtAwsAmazonWebServices >> defaultRegion: aString [ 
+	self client defaultRegion: aString
 ]
 
 { #category : #accessing }

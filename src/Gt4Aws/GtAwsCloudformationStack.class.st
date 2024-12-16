@@ -193,8 +193,9 @@ GtAwsCloudformationStack >> printOn: aStream [
 
 { #category : #accessing }
 GtAwsCloudformationStack >> refreshResources [
-	^ [ resources := (self client cloudformationListStackResourcesFor: self id)
-			collect: [ :aResource | aResource stack: self ] ]
+	^ [ resources := self client cloudformationListStackResourcesFor: self id.
+	resources do: [ :aResource | aResource stack: self ].
+	resources ]
 		on: Error
 		do: [ :anError | 
 			resourceError := anError.
