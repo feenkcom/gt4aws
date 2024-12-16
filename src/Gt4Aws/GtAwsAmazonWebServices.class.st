@@ -209,6 +209,20 @@ GtAwsAmazonWebServices >> ec2ListInstances [
 	^ GtAwsEc2InstanceGroup withAll: aCollection
 ]
 
+{ #category : #accessing }
+GtAwsAmazonWebServices >> ec2ListVpcs [
+	| output aCollection |
+	output := self client
+			run: (GtAwsCliArguments new
+					endpointPrefix: 'ec2';
+					operation: 'describe-vpcs').
+
+	aCollection := ((STONJSON fromString: output) at: 'Vpcs')
+			collect: [ :aDict | (GtAwsEc2Vpc fromDictionary: aDict) client: self ].
+
+	^ GtAwsEc2VpcGroup withAll: aCollection
+]
+
 { #category : #'gt - extensions' }
 GtAwsAmazonWebServices >> efs [
 	^ entityHolders at: 'EFS' ifAbsentPut: [ GtAwsEfs new client: self ]

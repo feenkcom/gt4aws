@@ -2,7 +2,8 @@ Class {
 	#name : #GtAwsEc2,
 	#superclass : #GtAwsEntityHolder,
 	#instVars : [
-		'instanceTypes'
+		'instanceTypes',
+		'vpcs'
 	],
 	#category : #'Gt4Aws-Model'
 }
@@ -23,6 +24,16 @@ GtAwsEc2 >> entitySearchKey [
 ]
 
 { #category : #'as yet unclassified' }
+GtAwsEc2 >> gtVpcsFor: aView [
+	<gtView>
+	^ aView forward
+		title: 'VPCs';
+		priority: 5;
+		object: [ self vpcs ];
+		view: #gtVpcsFor:
+]
+
+{ #category : #'as yet unclassified' }
 GtAwsEc2 >> instanceTypes [
 	^ instanceTypes ifNil: [ self refreshInstanceTypes ]
 ]
@@ -37,6 +48,11 @@ GtAwsEc2 >> refreshInstanceTypes [
 	^ instanceTypes := self client ec2InstanceTypes
 ]
 
+{ #category : #'as yet unclassified' }
+GtAwsEc2 >> refreshVpcs [
+	^ instanceTypes := self client ec2ListVpcs
+]
+
 { #category : #accessing }
 GtAwsEc2 >> serviceName [
 	^ 'AWS Elastic Compute Cloud'
@@ -45,4 +61,9 @@ GtAwsEc2 >> serviceName [
 { #category : #accessing }
 GtAwsEc2 >> viewName [
 	^ #gtInstancesFor:
+]
+
+{ #category : #'as yet unclassified' }
+GtAwsEc2 >> vpcs [
+	^ vpcs ifNil: [ self refreshVpcs ]
 ]
