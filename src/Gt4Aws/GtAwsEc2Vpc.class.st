@@ -8,7 +8,8 @@ Class {
 		'instanceTenancy',
 		'dhcpOptionsId',
 		'ownerId',
-		'state'
+		'state',
+		'routeTables'
 	],
 	#category : #'Gt4Aws-Model'
 }
@@ -44,6 +45,16 @@ GtAwsEc2Vpc >> dhcpOptionsId [
 { #category : #accessing }
 GtAwsEc2Vpc >> dhcpOptionsId: anObject [
 	dhcpOptionsId := anObject
+]
+
+{ #category : #'as yet unclassified' }
+GtAwsEc2Vpc >> gtRouteTablesFor: aView [
+	<gtView>
+	^ aView forward
+		title: 'Route tables';
+		priority: 1;
+		object: [ self routeTables ];
+		view: #gtRouteTablesFor:
 ]
 
 { #category : #accessing }
@@ -84,6 +95,13 @@ GtAwsEc2Vpc >> ownerId [
 { #category : #accessing }
 GtAwsEc2Vpc >> ownerId: anObject [
 	ownerId := anObject
+]
+
+{ #category : #'as yet unclassified' }
+GtAwsEc2Vpc >> routeTables [
+	^ routeTables
+		ifNil: [ routeTables := self client ec2 routeTables
+					select: [ :aRouteTable | aRouteTable vpcId = self id ] ]
 ]
 
 { #category : #accessing }

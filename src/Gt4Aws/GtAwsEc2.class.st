@@ -3,7 +3,9 @@ Class {
 	#superclass : #GtAwsEntityHolder,
 	#instVars : [
 		'instanceTypes',
-		'vpcs'
+		'vpcs',
+		'routeTables',
+		'transitGateways'
 	],
 	#category : #'Gt4Aws-Model'
 }
@@ -21,6 +23,26 @@ GtAwsEc2 >> entityName [
 { #category : #accessing }
 GtAwsEc2 >> entitySearchKey [
 	^ #id
+]
+
+{ #category : #'as yet unclassified' }
+GtAwsEc2 >> gtRouteTablesFor: aView [
+	<gtView>
+	^ aView forward
+		title: 'Route tables';
+		priority: 6;
+		object: [ self routeTables ];
+		view: #gtRouteTablesFor:
+]
+
+{ #category : #'as yet unclassified' }
+GtAwsEc2 >> gtTransitGatewaysFor: aView [
+	<gtView>
+	^ aView forward
+		title: 'Transit gateways';
+		priority: 7;
+		object: [ self transitGateways ];
+		view: #gtTransitGatewaysFor:
 ]
 
 { #category : #'as yet unclassified' }
@@ -49,8 +71,23 @@ GtAwsEc2 >> refreshInstanceTypes [
 ]
 
 { #category : #'as yet unclassified' }
+GtAwsEc2 >> refreshRouteTables [
+	^ routeTables := self client ec2ListRouteTables
+]
+
+{ #category : #'as yet unclassified' }
+GtAwsEc2 >> refreshTransitGateways [
+	^ transitGateways := self client ec2ListTransitGateways
+]
+
+{ #category : #'as yet unclassified' }
 GtAwsEc2 >> refreshVpcs [
-	^ instanceTypes := self client ec2ListVpcs
+	^ vpcs := self client ec2ListVpcs
+]
+
+{ #category : #'as yet unclassified' }
+GtAwsEc2 >> routeTables [
+	^ routeTables ifNil: [ self refreshRouteTables ]
 ]
 
 { #category : #accessing }
@@ -58,9 +95,19 @@ GtAwsEc2 >> serviceName [
 	^ 'AWS Elastic Compute Cloud'
 ]
 
+{ #category : #'as yet unclassified' }
+GtAwsEc2 >> transitGateways [
+	^ transitGateways ifNil: [ self refreshTransitGateways ]
+]
+
 { #category : #accessing }
 GtAwsEc2 >> viewName [
 	^ #gtInstancesFor:
+]
+
+{ #category : #'as yet unclassified' }
+GtAwsEc2 >> vpcAt: anId [
+	^ self vpcs detect: [ :aVpc | aVpc id = anId ]
 ]
 
 { #category : #'as yet unclassified' }

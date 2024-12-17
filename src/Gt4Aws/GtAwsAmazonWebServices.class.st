@@ -210,6 +210,34 @@ GtAwsAmazonWebServices >> ec2ListInstances [
 ]
 
 { #category : #accessing }
+GtAwsAmazonWebServices >> ec2ListRouteTables [
+	| output aCollection |
+	output := self client
+			run: (GtAwsCliArguments new
+					endpointPrefix: 'ec2';
+					operation: 'describe-route-tables').
+
+	aCollection := ((STONJSON fromString: output) at: 'RouteTables')
+			collect: [ :aDict | (GtAwsEc2RouteTable fromDictionary: aDict) client: self ].
+
+	^ GtAwsEc2RouteTableGroup withAll: aCollection
+]
+
+{ #category : #accessing }
+GtAwsAmazonWebServices >> ec2ListTransitGateways [
+	| output aCollection |
+	output := self client
+			run: (GtAwsCliArguments new
+					endpointPrefix: 'ec2';
+					operation: 'describe-transit-gateways').
+
+	aCollection := ((STONJSON fromString: output) at: 'TransitGateways')
+			collect: [ :aDict | (GtAwsEc2TransitGateway fromDictionary: aDict) client: self ].
+
+	^ GtAwsEc2TransitGatewayGroup withAll: aCollection
+]
+
+{ #category : #accessing }
 GtAwsAmazonWebServices >> ec2ListVpcs [
 	| output aCollection |
 	output := self client
