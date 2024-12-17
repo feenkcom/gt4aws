@@ -12,6 +12,7 @@ GtAwsOrgnizationsAccountGroup >> gtAccountsFor: aView [
 		priority: 1;
 		items: [ self items ];
 		column: 'Name' text: #name;
+		column: 'E-Mail' text: #email;
 		column: 'ID' text: #id;
 		column: 'ARN' text: #arn;
 		column: 'Status' text: #status;
