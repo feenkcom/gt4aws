@@ -321,6 +321,7 @@ GtAwsAmazonWebServices >> gtNavigations [
 		at: 'EKS' put: self eks;
 		at: 'EFS' put: self efs;
 		at: 'IAM' put: self iam;
+		at: 'Organizations' put: self organizations;
 		yourself
 ]
 
@@ -397,6 +398,27 @@ GtAwsAmazonWebServices >> lambdaListFunctions [
 			collect: [ :aDict | (GtAwsLambdaFunction fromDictionary: aDict) client: self ].
 
 	^ GtAwsLambdaFunctionGroup withAll: aCollection
+]
+
+{ #category : #'gt - extensions' }
+GtAwsAmazonWebServices >> organizations [
+	^ entityHolders
+		at: 'Organizations'
+		ifAbsentPut: [ GtAWSOrganizations new client: self ]
+]
+
+{ #category : #'as yet unclassified' }
+GtAwsAmazonWebServices >> organizationsListAccounts [
+	| output aCollection |
+	output := self client
+			run: (GtAwsCliArguments new
+					endpointPrefix: 'organizations';
+					operation: 'list-accounts').
+
+	aCollection := ((STONJSON fromString: output) at: 'Accounts')
+			collect: [ :aDict | (GtAwsOrganizationsAccount fromDictionary: aDict) client: self ].
+
+	^ GtAwsOrgnizationsAccountGroup withAll: aCollection
 ]
 
 { #category : #accessing }
