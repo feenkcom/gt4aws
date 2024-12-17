@@ -23,8 +23,3 @@ GtAwsEfs >> refreshEntities [
 GtAwsEfs >> serviceName [
 	^ 'AWS Elastic File System'
 ]
-
-{ #category : #accessing }
-GtAwsEfs >> viewName [
-	^ #gtLiveFor:
-]

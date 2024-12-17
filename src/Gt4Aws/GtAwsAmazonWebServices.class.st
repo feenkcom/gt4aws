@@ -33,6 +33,14 @@ GtAwsAmazonWebServices class >> uniqueInstance [
 	^ uniqueInstance ifNil: [ uniqueInstance := self new ]
 ]
 
+{ #category : #'as yet unclassified' }
+GtAwsAmazonWebServices >> awsRegion [
+	^ self client
+		run: {'configure'.
+				'get'.
+				'region'}
+]
+
 { #category : #accessing }
 GtAwsAmazonWebServices >> client [
 	^ client
@@ -91,9 +99,9 @@ GtAwsAmazonWebServices >> cloudformationListStackResourcesFor: aStackId [
 			run: (GtAwsCliArguments new
 					endpointPrefix: 'cloudformation';
 					operation: 'list-stack-resources';
-					add: {GtAwsCliArgument new
-								key: 'stack-name';
-								value: aStackId}).
+					add: (GtAwsCliArgument new
+							key: 'stack-name';
+							value: aStackId)).
 
 	^ GtAwsCloudFormationStackResourceGroup
 		withAll: (((STONJSON fromString: output) at: 'StackResourceSummaries')
@@ -112,6 +120,16 @@ GtAwsAmazonWebServices >> cloudformationListStacks [
 			collect: [ :aDict | (GtAwsCloudformationStack fromDictionary: aDict) client: self ].
 
 	^ GtAwsCloudformationStackGroup withAll: aCollection
+]
+
+{ #category : #'as yet unclassified' }
+GtAwsAmazonWebServices >> defaultProfile: aString [
+	self client defaultProfile: aString
+]
+
+{ #category : #'as yet unclassified' }
+GtAwsAmazonWebServices >> defaultRegion: aString [ 
+	self client defaultRegion: aString
 ]
 
 { #category : #accessing }
@@ -137,63 +155,23 @@ GtAwsAmazonWebServices >> ec2 [
 GtAwsAmazonWebServices >> ec2Command: operation instanceId: instanceId notification: aString [
 	"Perform the specified operation on the instanceId and notify the user.
 	This requires a different AWS user profile than other operations.  Set up the profile prior to starting the machine, and then delete it after."
-	| result |
-
-	monitor critical:
-		[ 
-		result := self primEc2Command: operation instanceId: instanceId.
-		"(FileLocator home / '.aws') resolve deleteAll" ].
-	"Notify the user that the runner has been started, but give GtWorld a chance to open first during image startup"
-	aString ifNotNil:
-		[ [ GtWorld allInstancesDo: [ :world |
-			world inform: aString ] ]
-			forkAt: Processor userSchedulingPriority ].
-	^ result
-]
-
-{ #category : #accessing }
-GtAwsAmazonWebServices >> ec2CreateTags: aCollectionOfAssociations instanceId: aString [
-	| args proc |
-
-	self assert: aCollectionOfAssociations notEmpty
-		description: 'There must be at least one tag defined'.
-	args := Array streamContents: [ :stream |
-		stream
-			nextPut: 'ec2';
-			nextPut: 'create-tags';
-			nextPut: '--resources';
-			nextPut: aString;
-			nextPut: '--tags'.
-		aCollectionOfAssociations do: [ :assoc |
-			stream nextPut: 'Key=', assoc key, ',Value=', assoc value ] ].
-	proc := GtSubprocessWithInMemoryOutput
-		command: self awsExecutable
-		arguments: args.
-	proc 
-		retryCount: retryCount;
-		addAllEnvVariablesFromParentWithoutOverride;
-		setDefaultErrorBlock.
-	monitor critical: [ proc runAndWait ].
+	"TODO: is this needed? and what for?"
+	^ self primEc2Command: operation instanceId: instanceId
 ]
 
 { #category : #accessing }
 GtAwsAmazonWebServices >> ec2GetInstance: anId [
-	| proc |
-	proc := GtSubprocessWithInMemoryOutput
-			command: self awsExecutable
-			arguments: {'ec2'.
-					'describe-instances'.
-					'--instance-ids'.
-					anId}.
-	proc
-		retryCount: retryCount;
-		addAllEnvVariablesFromParentWithoutOverride;
-		setDefaultErrorBlock.
-	monitor critical: [ proc runAndWait ].
+	| output |
+	output := self client
+			run: (GtAwsCliArguments new
+					endpointPrefix: 'ec2';
+					operation: 'describe-instances';
+					add: (GtAwsCliArgument new
+								key: 'instance-ids';
+								value: anId)).
 
 	^ GtAwsEc2Instance
-		fromDictionary: (((STONJSON fromString: proc stdout) at: 'Reservations') first at: 'Instances')
-				first
+		fromDictionary: (((STONJSON fromString: output) at: 'Reservations') first at: 'Instances') first
 ]
 
 { #category : #accessing }
@@ -218,22 +196,31 @@ GtAwsAmazonWebServices >> ec2InstanceTypes [
 
 { #category : #accessing }
 GtAwsAmazonWebServices >> ec2ListInstances [
-	| proc aCollection |
-	proc := GtSubprocessWithInMemoryOutput
-			command: self awsExecutable
-			arguments: {'ec2'.
-					'describe-instances'}.
-	proc
-		retryCount: retryCount;
-		addAllEnvVariablesFromParentWithoutOverride;
-		setDefaultErrorBlock.
-	monitor critical: [ proc runAndWait ].
+	| output aCollection |
+	output := self client
+			run: (GtAwsCliArguments new
+					endpointPrefix: 'ec2';
+					operation: 'describe-instances').
 
-	aCollection := (((STONJSON fromString: proc stdout) at: 'Reservations')
+	aCollection := (((STONJSON fromString: output) at: 'Reservations')
 			flatCollect: [ :aReservation | aReservation at: 'Instances' ])
 			collect: [ :aDict | (GtAwsEc2Instance fromDictionary: aDict) client: self ].
 
 	^ GtAwsEc2InstanceGroup withAll: aCollection
+]
+
+{ #category : #accessing }
+GtAwsAmazonWebServices >> ec2ListVpcs [
+	| output aCollection |
+	output := self client
+			run: (GtAwsCliArguments new
+					endpointPrefix: 'ec2';
+					operation: 'describe-vpcs').
+
+	aCollection := ((STONJSON fromString: output) at: 'Vpcs')
+			collect: [ :aDict | (GtAwsEc2Vpc fromDictionary: aDict) client: self ].
+
+	^ GtAwsEc2VpcGroup withAll: aCollection
 ]
 
 { #category : #'gt - extensions' }
@@ -243,18 +230,12 @@ GtAwsAmazonWebServices >> efs [
 
 { #category : #accessing }
 GtAwsAmazonWebServices >> efsListFileSystems [
-	| proc aCollection |
-	proc := GtSubprocessWithInMemoryOutput
-			command: self awsExecutable
-			arguments: {'efs'.
-					'describe-file-systems'}.
-	proc
-		retryCount: retryCount;
-		addAllEnvVariablesFromParentWithoutOverride;
-		setDefaultErrorBlock.
-	monitor critical: [ proc runAndWait ].
+	| output aCollection |
+	output := self client run: (GtAwsCliArguments new
+					endpointPrefix: 'efs';
+					operation: 'describe-file-systems')..
 
-	aCollection := ((STONJSON fromString: proc stdout) at: 'FileSystems')
+	aCollection := ((STONJSON fromString: output) at: 'FileSystems')
 			collect: [ :aDict | (GtAwsEfsFileSystem fromDictionary: aDict) client: self ].
 
 	^ GtAwsEfsFileSystemGroup withAll: aCollection
@@ -267,18 +248,13 @@ GtAwsAmazonWebServices >> eks [
 
 { #category : #accessing }
 GtAwsAmazonWebServices >> eksListClusters [
-	| proc aCollection |
-	proc := GtSubprocessWithInMemoryOutput
-			command: self awsExecutable
-			arguments: {'eks'.
-					'list-clusters'}.
-	proc
-		retryCount: retryCount;
-		addAllEnvVariablesFromParentWithoutOverride;
-		setDefaultErrorBlock.
-	monitor critical: [ proc runAndWait ].
+	| aCollection output |
+	output := self client
+			run: (GtAwsCliArguments new
+					endpointPrefix: 'eks';
+					operation: 'list-clusters').
 
-	aCollection := ((STONJSON fromString: proc stdout) at: 'clusters')
+	aCollection := ((STONJSON fromString: output) at: 'clusters')
 			collect: [ :aDict | (GtAwsEksCluster fromDictionary: aDict) client: self ].
 
 	^ GtAwsEksClusterGroup withAll: aCollection
@@ -292,54 +268,6 @@ GtAwsAmazonWebServices >> find: aResourceType orFind: anId InEndpoint: anEndpoin
 				ifTrue: [ (anEntityHolder findEntityWithId: anId) ifNotNil: [ :anEntity | ^ anEntity ] ] ].
 
 	^ self perform: anEndpoint withArguments: {anId}
-]
-
-{ #category : #accessing }
-GtAwsAmazonWebServices >> getInstanceNameOf: instanceId [
-	| proc |
-
-	proc := GtSubprocessWithInMemoryOutput
-		command: self awsExecutable
-		arguments: {
-			'ec2'.
-			'describe-instances'.
-			'--instance-id'.
-			instanceId.
-			'--query'.
-			'Reservations[*].Instances[*].Tags[?Key==''Name''].Value'.
-			'--output'.
-			'text'.
-			}.
-	proc
-		retryCount: retryCount; 
-		addAllEnvVariablesFromParentWithoutOverride.
-	monitor critical: [ proc runAndWait ].
-	proc isSuccess ifFalse: [ ^ nil ].
-	^ proc stdout trimBoth.
-]
-
-{ #category : #accessing }
-GtAwsAmazonWebServices >> getParameterNamed: nameString [
-	|  proc |
-
-	proc := GtSubprocessWithInMemoryOutput
-		command: self awsExecutable
-		arguments: (Array
-				with: 'ssm'
-				with: 'get-parameter'
-				with: '--name'
-				with: nameString
-				with: '--query'
-				with: 'Parameter.Value'
-				with: '--output'
-				with: 'text').
-	proc
-		retryCount: retryCount;
-		addAllEnvVariablesFromParentWithoutOverride;
-		setDefaultErrorBlock.
-	monitor critical: [ proc runAndWait ].
-	^ proc stdout trimAll.
-
 ]
 
 { #category : #'gt - extensions' }
@@ -364,7 +292,27 @@ GtAwsAmazonWebServices >> gtNavigations [
 		at: 'EC2' put: self ec2;
 		at: 'EKS' put: self eks;
 		at: 'EFS' put: self efs;
+		at: 'IAM' put: self iam;
 		yourself
+]
+
+{ #category : #'as yet unclassified' }
+GtAwsAmazonWebServices >> iam [
+	^ entityHolders at: 'IAM' ifAbsentPut: [ GtAwsIAM new client: self ]
+]
+
+{ #category : #accessing }
+GtAwsAmazonWebServices >> iamListRoles [
+	| output aCollection |
+	output := self client
+			run: (GtAwsCliArguments new
+					endpointPrefix: 'iam';
+					operation: 'list-roles').
+
+	aCollection := ((STONJSON fromString: output) at: 'Roles')
+			collect: [ :aDict | (GtAwsIAMRole fromDictionary: aDict) client: self ].
+
+	^ GtAwsIAMRoleGroup withAll: aCollection
 ]
 
 { #category : #accessing }
@@ -375,11 +323,6 @@ GtAwsAmazonWebServices >> initialize [
 	client := GtAwsClient new
 ]
 
-{ #category : #accessing }
-GtAwsAmazonWebServices >> instanceTypes [
-	^  self ec2 instanceTypes
-]
-
 { #category : #'gt - extensions' }
 GtAwsAmazonWebServices >> lambda [
 	^ entityHolders at: 'Lambda' ifAbsentPut: [ GtAwsLambda new client: self ]
@@ -387,55 +330,42 @@ GtAwsAmazonWebServices >> lambda [
 
 { #category : #accessing }
 GtAwsAmazonWebServices >> lambdaGetFunction: anId [
-	| proc |
-	proc := GtSubprocessWithInMemoryOutput
-			command: self awsExecutable
-			arguments: {'lambda'.
-					'get-function'.
-					'--function-name'.
-					anId}.
-	proc
-		retryCount: retryCount;
-		addAllEnvVariablesFromParentWithoutOverride;
-		setDefaultErrorBlock.
-	monitor critical: [ proc runAndWait ].
+	| output |
+	output := self client
+			run: (GtAwsCliArguments new
+					endpointPrefix: 'lambda';
+					operation: 'get-function';
+					add: (GtAwsCliArgument new
+								key: 'function-name';
+								value: anId)).
 
-	^ (GtAwsLambdaFunction fromDictionary: (STONJSON fromString: proc stdout))
+	^ (GtAwsLambdaFunction fromDictionary: (STONJSON fromString: output))
 		client: self
 ]
 
 { #category : #accessing }
 GtAwsAmazonWebServices >> lambdaListFunctionTagsFor: anArn [
-	| proc |
-	proc := GtSubprocessWithInMemoryOutput
-			command: self awsExecutable
-			arguments: {'lambda'.
-					'list-tags'.
-					'--resource'.
-					anArn}.
-	proc
-		retryCount: retryCount;
-		addAllEnvVariablesFromParentWithoutOverride;
-		setDefaultErrorBlock.
-	monitor critical: [ proc runAndWait ].
+	| output |
+	output := self client
+			run: (GtAwsCliArguments new
+					endpointPrefix: 'lambda';
+					operation: 'list-tags';
+					add: (GtAwsCliArgument new
+								key: 'resource';
+								value: anArn)).
 
-	^ (STONJSON fromString: proc stdout) at: 'Tags'
+	^ (STONJSON fromString: output) at: 'Tags'
 ]
 
 { #category : #accessing }
 GtAwsAmazonWebServices >> lambdaListFunctions [
-	| proc aCollection |
-	proc := GtSubprocessWithInMemoryOutput
-			command: self awsExecutable
-			arguments: {'lambda'.
-					'list-functions'}.
-	proc
-		retryCount: retryCount;
-		addAllEnvVariablesFromParentWithoutOverride;
-		setDefaultErrorBlock.
-	monitor critical: [ proc runAndWait ].
+	| output aCollection |
+	output := self client
+			run: (GtAwsCliArguments new
+					endpointPrefix: 'lambda';
+					operation: 'list-functions').
 
-	aCollection := ((STONJSON fromString: proc stdout) at: 'Functions')
+	aCollection := ((STONJSON fromString: output) at: 'Functions')
 			collect: [ :aDict | (GtAwsLambdaFunction fromDictionary: aDict) client: self ].
 
 	^ GtAwsLambdaFunctionGroup withAll: aCollection
@@ -443,49 +373,13 @@ GtAwsAmazonWebServices >> lambdaListFunctions [
 
 { #category : #accessing }
 GtAwsAmazonWebServices >> primEc2Command: operation instanceId: aString [
-	| proc |
-
-	proc := GtSubprocessWithInMemoryOutput
-		command: self awsExecutable
-		arguments: {
-			'ec2'.
-			operation.
-			'--instance-ids'.
-			aString.
-			}.
-	proc 
-		retryCount: retryCount;
-		addAllEnvVariablesFromParentWithoutOverride;
-		setDefaultErrorBlock.
-	monitor critical: [ proc runAndWait ].
-
-	^ proc stdout trimBoth.
-]
-
-{ #category : #accessing }
-GtAwsAmazonWebServices >> putParameterNamed: nameString value: valueString [
-	|  proc |
-
-	proc := GtSubprocessWithInMemoryOutput
-		command: self awsExecutable
-		arguments: {
-			'ssm'.
-			'put-parameter'.
-			'--overwrite'.
-			'--type'.
-			'StringList'.
-			'--name'.
-			nameString.
-			'--value'.
-			valueString.
-			}.
-	proc
-		retryCount: retryCount;
-		addAllEnvVariablesFromParentWithoutOverride;
-		setDefaultErrorBlock.
-	monitor critical: [ proc runAndWait ].
-	^ proc stdout trimAll.
-
+	^ self client
+		run: (GtAwsCliArguments new
+				endpointPrefix: 'ec2';
+				operation: operation;
+				add: (GtAwsCliArgument new
+							key: 'instance-ids';
+							value: aString))
 ]
 
 { #category : #'gt - extensions' }
@@ -495,50 +389,32 @@ GtAwsAmazonWebServices >> rds [
 
 { #category : #accessing }
 GtAwsAmazonWebServices >> rdsDescribeInstance: anId [
-	| proc |
-	proc := GtSubprocessWithInMemoryOutput
-			command: self awsExecutable
-			arguments: {'rds'.
-					'describe-db-instances'.
-					'--db-instance-identifier'.
-					anId}.
-	proc
-		retryCount: retryCount;
-		addAllEnvVariablesFromParentWithoutOverride;
-		setDefaultErrorBlock.
-	monitor critical: [ proc runAndWait ].
+	| output |
+	output := self client
+			run: (GtAwsCliArguments new
+					endpointPrefix: 'rds';
+					operation: 'describe-db-instances';
+					add: (GtAwsCliArgument new
+								key: 'db-instance-identifier';
+								value: anId)).
 
 	^ GtAwsRDSInstance new
 		client: self;
-		jsonObject: (STONJSON fromString: proc stdout)
+		jsonObject: (STONJSON fromString: output)
 ]
 
 { #category : #accessing }
 GtAwsAmazonWebServices >> rdsDescribeInstances [
-	| proc aCollection |
-	proc := GtSubprocessWithInMemoryOutput
-			command: self awsExecutable
-			arguments: {'rds'.
-					'describe-db-instances'}.
-	proc
-		retryCount: retryCount;
-		addAllEnvVariablesFromParentWithoutOverride;
-		setDefaultErrorBlock.
-	monitor critical: [ proc runAndWait ].
-	aCollection := ((STONJSON fromString: proc stdout) at: 'DBInstances')
+	| aCollection output |
+	output := self client
+			run: (GtAwsCliArguments new
+					endpointPrefix: 'rds';
+					operation: 'describe-db-instances').
+								
+	aCollection := ((STONJSON fromString: output) at: 'DBInstances')
 			collect: [ :anInstance | (GtAwsRDSInstance fromDictionary: anInstance) client: self ].
 
 	^ GtAwsRDSInstanceGroup withAll: aCollection
-]
-
-{ #category : #accessing }
-GtAwsAmazonWebServices >> retryCount [
-	^ retryCount
-]
-
-{ #category : #accessing }
-GtAwsAmazonWebServices >> retryCount: anInteger [
-	retryCount := anInteger
 ]
 
 { #category : #'gt - extensions' }
@@ -551,21 +427,12 @@ GtAwsAmazonWebServices >> s3Cp: srcString to: dstString [
 	"Copy srcString to dstString.
 	One must be in the format of a s3 URL, i.e. s3://path/to/file.
 	The other must be a local file."
-	| proc |
-
-	proc := GtSubprocessWithInMemoryOutput
-		command: self awsExecutable
-		arguments: {
+	^ self client run: {
 				's3'.
 				'cp'.
 				srcString.
 				dstString.
 				}.
-	proc
-		retryCount: retryCount;
-		addAllEnvVariablesFromParentWithoutOverride;
-		setDefaultErrorBlock.
-	monitor critical: [ proc runAndWait ].
 ]
 
 { #category : #accessing }
@@ -590,36 +457,26 @@ GtAwsAmazonWebServices >> s3GetBucket: aBucketId [
 
 { #category : #accessing }
 GtAwsAmazonWebServices >> s3ListTagsForBucket: aName [
-	| proc |
-	proc := GtSubprocessWithInMemoryOutput
-			command: self awsExecutable
-			arguments: {'s3api'.
-					'get-bucket-tagging'.
-					'--bucket'.
-					aName}.
-	proc
-		retryCount: retryCount;
-		addAllEnvVariablesFromParentWithoutOverride;
-		setDefaultErrorBlock.
-	monitor critical: [ proc runAndWait ].
+	| output |
+	output := self client
+			run: (GtAwsCliArguments new
+					endpointPrefix: 's3api';
+					operation: 'get-bucket-tagging';
+					add: (GtAwsCliArgument new
+								key: 'bucket';
+								value: aName)).
 
-	^ (STONJSON fromString: proc stdout) at: 'TagSet'
+	^ (STONJSON fromString: output) at: 'TagSet'
 ]
 
 { #category : #accessing }
 GtAwsAmazonWebServices >> s3Ls [
-	| proc |
-	proc := GtSubprocessWithInMemoryOutput
-			command: self awsExecutable
-			arguments: {'s3'.
+	| output |
+	output := self client
+			run: {'s3'.
 					'ls'}.
-	proc
-		retryCount: retryCount;
-		addAllEnvVariablesFromParentWithoutOverride;
-		setDefaultErrorBlock.
-	monitor critical: [ proc runAndWait ].
 	^ GtAwsS3BucketGroup
-		withAll: (proc stdout lines
+		withAll: (output lines
 				collect: [ :aLine | 
 					| words |
 					words := Character space split: aLine.
@@ -630,159 +487,75 @@ GtAwsAmazonWebServices >> s3Ls [
 ]
 
 { #category : #accessing }
-GtAwsAmazonWebServices >> s3MakeBucket: aString [
-	"Create the specified bucket.
-	aString must be in the format of a s3 URL, i.e. s3://path/to/dir."
-	| proc |
-
-	proc := GtSubprocessWithInMemoryOutput
-		command: self awsExecutable
-		arguments: {
-				's3'.
-				'mb'.
-				aString.
-				}.
-	proc
-		addAllEnvVariablesFromParentWithoutOverride;
-		setDefaultErrorBlock.
-	monitor critical: [ proc runAndWait ].
-]
-
-{ #category : #accessing }
 GtAwsAmazonWebServices >> s3ls: aString [
 	"Answer the contents of the supplied S3 bucket.
 	aString must be in the format of a s3 URL, i.e. s3://path/to/dir.
 	For now answer { file name string. file size string. file date string. }
 	Directories have a trailing slash (/), 0 size and nil date."
-	| proc lsString files fileRx directoryRx |
 
-	proc := GtSubprocessWithInMemoryOutput
-		command: self awsExecutable
-		arguments: {
-				's3'.
-				'ls'.
-				aString.
-				}.
-	proc
-		retryCount: retryCount;
-		addAllEnvVariablesFromParentWithoutOverride;
-		setDefaultErrorBlock.
-	monitor critical: [ proc runAndWait ].
-	
-	lsString := proc stdout trimBoth.
+	| output files fileRx directoryRx |
+	output := self client
+			run: {'s3'.
+					'ls'.
+					aString}.
+
 	fileRx := '([0-9\-]+ [0-9:]+) +(\d+) +(.+)' asRegex.
 	directoryRx := ' *PRE (.+)' asRegex.
-	files := Array streamContents: [ :stream |
-	lsString linesDo: [ :each | | search |
-		search := fileRx search: each.
-		search ifTrue:
-			[ stream nextPut: (GtAwsS3FileReference new
-				s3DirectoryUrl: aString;
-				basename: (fileRx subexpressions: 4) first;
-				size: (fileRx subexpressions: 3) first asNumber;
-				modificationTime: (fileRx subexpressions: 2) first) ].
-		search := directoryRx search: each.
-		search ifTrue:
-			[ stream nextPut: (GtAwsS3FileReference new
-				s3DirectoryUrl: aString;
-				basename: (directoryRx subexpressions: 2) first;
-				size: 0) ] ] ].
-	^ files.
-]
-
-{ #category : #accessing }
-GtAwsAmazonWebServices >> setAccessKeyId: aString [
-	| proc |
-
-	proc := GtSubprocessWithInMemoryOutput
-		command: self awsExecutable
-		arguments: {
-			'configure'.
-			'set'.
-			'aws_access_key_id'.
-			aString.
-			}.
-	proc 
-		addAllEnvVariablesFromParentWithoutOverride;
-		setDefaultErrorBlock.
-	monitor critical: [ proc runAndWait ].
-]
-
-{ #category : #accessing }
-GtAwsAmazonWebServices >> setRegion: aString [
-	| proc |
-
-	proc := GtSubprocessWithInMemoryOutput
-		command: self awsExecutable
-		arguments: {
-			'configure'.
-			'set'.
-			'region'.
-			aString.
-			}.
-	proc 
-		addAllEnvVariablesFromParentWithoutOverride;
-		setDefaultErrorBlock.
-	monitor critical: [ proc runAndWait ].
-]
-
-{ #category : #accessing }
-GtAwsAmazonWebServices >> setSecretAccessKey: aString [
-	| proc |
-
-	proc := GtSubprocessWithInMemoryOutput
-		command: self awsExecutable
-		arguments: {
-			'configure'.
-			'set'.
-			'aws_secret_access_key'.
-			aString.
-			}.
-	proc 
-		addAllEnvVariablesFromParentWithoutOverride;
-		setDefaultErrorBlock.
-	monitor critical: [ proc runAndWait ].
+	files := Array
+			streamContents: [ :stream | 
+				output
+					linesDo: [ :each | 
+						| search |
+						search := fileRx search: each.
+						search
+							ifTrue: [ stream
+									nextPut: (GtAwsS3FileReference new
+											s3DirectoryUrl: aString;
+											basename: (fileRx subexpressions: 4) first;
+											size: (fileRx subexpressions: 3) first asNumber;
+											modificationTime: (fileRx subexpressions: 2) first) ].
+						search := directoryRx search: each.
+						search
+							ifTrue: [ stream
+									nextPut: (GtAwsS3FileReference new
+											s3DirectoryUrl: aString;
+											basename: (directoryRx subexpressions: 2) first;
+											size: 0) ] ] ].
+	^ files
 ]
 
 { #category : #accessing }
 GtAwsAmazonWebServices >> sqsGetQueueAttributes: aQueueId [
-	| proc |
-	proc := GtSubprocessWithInMemoryOutput
-			command: self awsExecutable
-			arguments: {'sqs'.
-					'get-queue-attributes'.
-					'--queue-url'.
-					aQueueId.
-					'--attribute-names'.
-					'All'}.
-	proc
-		retryCount: retryCount;
-		addAllEnvVariablesFromParentWithoutOverride;
-		setDefaultErrorBlock.
-	monitor critical: [ proc runAndWait ].
+	| output |
+	output := self client
+			run: (GtAwsCliArguments new
+					endpointPrefix: 'sqs';
+					operation: 'get-queue-attributes';
+					add: (GtAwsCliArgument new
+							key: 'queue-url';
+							value: aQueueId);
+					add: (GtAwsCliArgument new
+							key: 'attribute-names';
+							value: 'All')).
 
 	^ GtAwsSQSQueue new
 		client: self;
 		url: aQueueId;
-		attributes: ((STONJSON fromString: proc stdout) at: 'Attributes')
+		attributes: ((STONJSON fromString: output) at: 'Attributes')
 ]
 
 { #category : #accessing }
 GtAwsAmazonWebServices >> sqsListQueueTagsFor: aUrl [
-	| proc |
-	proc := GtSubprocessWithInMemoryOutput
-			command: self awsExecutable
-			arguments: {'sqs'.
-					'list-queue-tags'.
-					'--queue-url'.
-					aUrl}.
-	proc
-		retryCount: retryCount;
-		addAllEnvVariablesFromParentWithoutOverride;
-		setDefaultErrorBlock.
-	monitor critical: [ proc runAndWait ].
+	| output |
+	output := self client
+			run: (GtAwsCliArguments new
+					endpointPrefix: 'sqs';
+					operation: 'list-queue-tags';
+					add: (GtAwsCliArgument new
+							key: 'queue-url';
+							value: aUrl)).
 
-	^ proc stdout
+	^ output
 		ifEmpty: [ Dictionary new ]
-		ifNotEmpty: [ (STONJSON fromString: proc stdout) at: 'Tags' ]
+		ifNotEmpty: [ (STONJSON fromString: output) at: 'Tags' ]
 ]
