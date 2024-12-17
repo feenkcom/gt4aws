@@ -66,6 +66,11 @@ GtAwsEc2TransitGateway >> id: anObject [
 	id := anObject
 ]
 
+{ #category : #'as yet unclassified' }
+GtAwsEc2TransitGateway >> owner [
+	^ self client organizations lookupAccount: self ownerId
+]
+
 { #category : #accessing }
 GtAwsEc2TransitGateway >> ownerId [
 	^ ownerId

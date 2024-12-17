@@ -46,6 +46,11 @@ GtAwsEc2RouteTable >> id: anObject [
 	id := anObject
 ]
 
+{ #category : #'as yet unclassified' }
+GtAwsEc2RouteTable >> owner [
+	^ self client organizations lookupAccount: self ownerId
+]
+
 { #category : #accessing }
 GtAwsEc2RouteTable >> ownerId [
 	^ ownerId

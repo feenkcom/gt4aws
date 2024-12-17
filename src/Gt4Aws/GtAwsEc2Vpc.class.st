@@ -87,6 +87,11 @@ GtAwsEc2Vpc >> isDefault: anObject [
 	isDefault := anObject
 ]
 
+{ #category : #'as yet unclassified' }
+GtAwsEc2Vpc >> owner [
+	^ self client organizations lookupAccount: self ownerId
+]
+
 { #category : #accessing }
 GtAwsEc2Vpc >> ownerId [
 	^ ownerId
