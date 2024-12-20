@@ -122,6 +122,58 @@ GtAwsAmazonWebServices >> cloudformationListStacks [
 	^ GtAwsCloudformationStackGroup withAll: aCollection
 ]
 
+{ #category : #'gt - extensions' }
+GtAwsAmazonWebServices >> codePipeline [
+	^ entityHolders
+		at: 'CodePipeline'
+		ifAbsentPut: [ GtAWSCodePipeline new client: self ]
+]
+
+{ #category : #accessing }
+GtAwsAmazonWebServices >> codePipelineGetPipeline: aName [
+	| output |
+	output := self client
+			run: (GtAwsCliArguments new
+					endpointPrefix: 'codepipeline';
+					operation: 'get-pipeline';
+					add: (GtAwsCliArgument new
+							key: 'name';
+							value: aName)).
+
+	^ (GtAwsCPPipelineStages
+		fromDictionary: ((STONJSON fromString: output) at: 'pipeline')) client: self
+]
+
+{ #category : #accessing }
+GtAwsAmazonWebServices >> codePipelineGetPipelineState: aName [
+	| output |
+	output := self client
+			run: (GtAwsCliArguments new
+					endpointPrefix: 'codepipeline';
+					operation: 'get-pipeline-state';
+					add: (GtAwsCliArgument new
+							key: 'name';
+							value: aName)).
+
+	^ GtAwsCPPipelineStatus
+		withAll: (((STONJSON fromString: output) at: 'stageStates')
+				collect: [ :aState | GtAwsCPPipelineStageStatus fromDictionary: aState ])
+]
+
+{ #category : #accessing }
+GtAwsAmazonWebServices >> codePipelineListPipelines [
+	| output aCollection |
+	output := self client
+			run: (GtAwsCliArguments new
+					endpointPrefix: 'codepipeline';
+					operation: 'list-pipelines').
+
+	aCollection := ((STONJSON fromString: output) at: 'pipelines')
+			collect: [ :aDict | (GtAwsCPPipeline fromDictionary: aDict) client: self ].
+
+	^ GtAwsCPPipelineGroup withAll: aCollection
+]
+
 { #category : #'as yet unclassified' }
 GtAwsAmazonWebServices >> defaultProfile: aString [
 	self client defaultProfile: aString
@@ -322,6 +374,7 @@ GtAwsAmazonWebServices >> gtNavigations [
 		at: 'EFS' put: self efs;
 		at: 'IAM' put: self iam;
 		at: 'Organizations' put: self organizations;
+		at: 'CodePipeline' put: self codePipeline;
 		yourself
 ]
 

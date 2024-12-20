@@ -23,6 +23,11 @@ GtAwsObject class >> forResourceType: aResourceType ifNotFound: aBlock [
 	^ aBlock value
 ]
 
+{ #category : #'as yet unclassified' }
+GtAwsObject class >> fromDictionary: aDict [
+	^ self new jsonObject: aDict
+]
+
 { #category : #'instance  creation' }
 GtAwsObject class >> jsonObject: aJsonObject [
 
