@@ -15,6 +15,29 @@ GtAwsCPPipelineStageStatus class >> fromDictionary: aDict [
 		latestExecution: (aDict at: 'latestExecution' ifAbsent: [ nil ])
 ]
 
+{ #category : #'as yet unclassified' }
+GtAwsCPPipelineStageStatus >> gtStatesFor: aView [
+	<gtView>
+	^ aView columnedList
+		title: 'States';
+		priority: 1;
+		items: [ self jsonObject at: 'actionStates' ];
+		column: 'Name' text: [ :aState | aState at: 'actionName' ];
+		column: 'Status'
+			text: [ :aState | aState at: 'latestExecution' at: 'status' ];
+		column: 'Updated'
+			text: [ :aState | aState at: 'latestExecution' at: 'lastStatusChange' ];
+		column: 'Management console'
+			icon: [ :aState | 
+				((aState at: 'latestExecution') includesKey: 'externalExecutionUrl')
+					ifTrue: [ BrButton new
+							aptitude: BrGlamorousButtonWithIconAptitude new;
+							label: 'Go to management console';
+							icon: BrGlamorousVectorIcons window;
+							action: [ WebBrowser openOn: (aState at: 'latestExecution' at: 'externalExecutionUrl') ] ]
+					ifFalse: [ BlElement new size: 0 @ 0 ] ]
+]
+
 { #category : #accessing }
 GtAwsCPPipelineStageStatus >> latestExecution [
 	^ latestExecution
@@ -23,6 +46,11 @@ GtAwsCPPipelineStageStatus >> latestExecution [
 { #category : #accessing }
 GtAwsCPPipelineStageStatus >> latestExecution: anObject [
 	latestExecution := anObject
+]
+
+{ #category : #'as yet unclassified' }
+GtAwsCPPipelineStageStatus >> managementConsoleUrl [
+	^ (self jsonObject at: 'actionStates') first at: 'externalExecutionUrl'
 ]
 
 { #category : #accessing }

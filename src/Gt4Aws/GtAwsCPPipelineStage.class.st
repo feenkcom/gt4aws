@@ -26,6 +26,16 @@ GtAwsCPPipelineStage >> actions: anObject [
 	actions := anObject
 ]
 
+{ #category : #'as yet unclassified' }
+GtAwsCPPipelineStage >> gtStageStatusFor: aView [
+	<gtView>
+	^ aView forward
+		title: 'Status';
+		priority: 1;
+		object: [ self status ];
+		view: #gtStatesFor:
+]
+
 { #category : #accessing }
 GtAwsCPPipelineStage >> name [
 	^ name
