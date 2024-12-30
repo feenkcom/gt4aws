@@ -36,6 +36,11 @@ GtAwsCPPipelineStage >> gtStageStatusFor: aView [
 		view: #gtStatesFor:
 ]
 
+{ #category : #'as yet unclassified' }
+GtAwsCPPipelineStage >> managementConsoleUrl [
+	^ self pipeline managementConsoleUrl
+]
+
 { #category : #accessing }
 GtAwsCPPipelineStage >> name [
 	^ name

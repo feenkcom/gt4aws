@@ -77,6 +77,11 @@ GtAwsOrganizationsAccount >> joinedTimestamp: anObject [
 ]
 
 { #category : #accessing }
+GtAwsOrganizationsAccount >> lookupInCloudFormation [
+	^ self client cloudformation lookupObject: self id
+]
+
+{ #category : #accessing }
 GtAwsOrganizationsAccount >> managementConsoleProperties [
 	^ '/accounts/', self id
 ]

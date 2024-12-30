@@ -49,6 +49,11 @@ GtAwsIAMRole >> createDate: anObject [
 ]
 
 { #category : #accessing }
+GtAwsIAMRole >> lookupInCloudFormation [
+	^ self client cloudformation lookupObject: self roleName
+]
+
+{ #category : #accessing }
 GtAwsIAMRole >> maxSessionDuration [
 	^ maxSessionDuration
 ]

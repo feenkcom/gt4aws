@@ -45,6 +45,18 @@ GtAwsCPPipeline >> gtPipelineFor: aView [
 ]
 
 { #category : #accessing }
+GtAwsCPPipeline >> lookupInCloudFormation [
+	^ self client cloudformation lookupObject: self name
+]
+
+{ #category : #'as yet unclassified' }
+GtAwsCPPipeline >> managementConsoleUrl [
+	^ 'https://' , self client awsRegion
+		, '.console.aws.amazon.com/codesuite/codepipeline/pipelines/' , self name
+		, '/view'
+]
+
+{ #category : #accessing }
 GtAwsCPPipeline >> name [
 	^ name
 ]
