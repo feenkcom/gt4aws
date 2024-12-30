@@ -77,6 +77,22 @@ GtAwsOrganizationsAccount >> joinedTimestamp: anObject [
 ]
 
 { #category : #accessing }
+GtAwsOrganizationsAccount >> lookupInCloudFormation [
+	^ self client cloudformation lookupObject: self id
+]
+
+{ #category : #accessing }
+GtAwsOrganizationsAccount >> managementConsoleProperties [
+	^ '/accounts/', self id
+]
+
+{ #category : #'as yet unclassified' }
+GtAwsOrganizationsAccount >> managementConsoleUrl [
+	^ 'https://' , self client awsRegion , '.console.aws.amazon.com/'
+		, self urlBaseName , '/home' , self managementConsoleProperties
+]
+
+{ #category : #accessing }
 GtAwsOrganizationsAccount >> name [
 	^ name
 ]

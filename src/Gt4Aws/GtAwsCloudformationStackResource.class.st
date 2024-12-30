@@ -88,6 +88,11 @@ GtAwsCloudformationStackResource >> logicalResourceId: anObject [
 ]
 
 { #category : #accessing }
+GtAwsCloudformationStackResource >> managementConsoleProperties [
+	^ '/stacks/resources?stackId=' , self stack id
+]
+
+{ #category : #accessing }
 GtAwsCloudformationStackResource >> physicalResourceId [
 	^ physicalResourceId
 ]
@@ -180,4 +185,9 @@ GtAwsCloudformationStackResource >> treeId [
 { #category : #accessing }
 GtAwsCloudformationStackResource >> treeType [
 	^ 'Stack resource'
+]
+
+{ #category : #'as yet unclassified' }
+GtAwsCloudformationStackResource >> urlBaseName [
+	^ 'cloudformation'
 ]
