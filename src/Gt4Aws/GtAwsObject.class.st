@@ -127,5 +127,5 @@ GtAwsObject >> tagAt: aName [
 
 { #category : #accessing }
 GtAwsObject >> urlBaseName [
-	^ self subclassResponsibility
+	^ 'organizations/v2'
 ]

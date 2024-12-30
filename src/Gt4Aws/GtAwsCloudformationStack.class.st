@@ -172,6 +172,11 @@ GtAwsCloudformationStack >> lastUpdated: anObject [
 ]
 
 { #category : #accessing }
+GtAwsCloudformationStack >> managementConsoleProperties [
+	^ '/stacks/stackinfo?stackId=' , self id
+]
+
+{ #category : #accessing }
 GtAwsCloudformationStack >> name [
 	^ name
 ]
@@ -254,4 +259,9 @@ GtAwsCloudformationStack >> treeId [
 { #category : #accessing }
 GtAwsCloudformationStack >> treeType [
 	^ 'Stack'
+]
+
+{ #category : #accessing }
+GtAwsCloudformationStack >> urlBaseName [
+	^ 'cloudformation'
 ]

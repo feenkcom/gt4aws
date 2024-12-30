@@ -77,6 +77,17 @@ GtAwsOrganizationsAccount >> joinedTimestamp: anObject [
 ]
 
 { #category : #accessing }
+GtAwsOrganizationsAccount >> managementConsoleProperties [
+	^ '/accounts/', self id
+]
+
+{ #category : #'as yet unclassified' }
+GtAwsOrganizationsAccount >> managementConsoleUrl [
+	^ 'https://' , self client awsRegion , '.console.aws.amazon.com/'
+		, self urlBaseName , '/home' , self managementConsoleProperties
+]
+
+{ #category : #accessing }
 GtAwsOrganizationsAccount >> name [
 	^ name
 ]
