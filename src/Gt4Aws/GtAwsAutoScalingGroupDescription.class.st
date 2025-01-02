@@ -8,6 +8,13 @@ Class {
 }
 
 { #category : #lejsonv4 }
+GtAwsAutoScalingGroupDescription class >> deSerializeAllImplementorsInstances [
+	"Answer a collection of instances to be tested for serialisation / deserialisation"
+
+	^ { self new groupName: 'for_testing' }
+]
+
+{ #category : #lejsonv4 }
 GtAwsAutoScalingGroupDescription class >> leJsonV4Name [
 
 	^ #GtAwsAutoScalingGroupDescription
