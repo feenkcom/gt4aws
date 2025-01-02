@@ -14,7 +14,7 @@ GtAwsInstance >> availabilityZone [
 GtAwsInstance >> coreCount [
 	"Answer the number of cores in the instance."
 
-	^ (GtAwsAmazonWebServices default instanceTypes at: self instanceType) coreCount
+	^ (GtAwsAmazonWebServices default ec2 instanceTypes at: self instanceType) coreCount
 ]
 
 { #category : #accessing }

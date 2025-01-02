@@ -7,12 +7,27 @@ Class {
 	#category : #'Gt4Aws-Model'
 }
 
-{ #category : #'instance  creation' }
-GtAwsAutoScalingGroupDescription class >> forGroupName: aString [
+{ #category : #lejsonv4 }
+GtAwsAutoScalingGroupDescription class >> deSerializeAllImplementorsInstances [
+	"Answer a collection of instances to be tested for serialisation / deserialisation"
 
-	^ self new initializeGroupName: aString jsonObject: 
-		(GtAwsAmazonWebServices uniqueInstance
-			autoScalingGroupDescriptionFor: aString).
+	^ { self new groupName: 'for_testing' }
+]
+
+{ #category : #lejsonv4 }
+GtAwsAutoScalingGroupDescription class >> leJsonV4Name [
+
+	^ #GtAwsAutoScalingGroupDescription
+]
+
+{ #category : #accessing }
+GtAwsAutoScalingGroupDescription >> activeCoreCount [
+	"Answer the number of active cores in the receiver.
+	In this context pending cores are considered active since the machine has been allocated and is in the process of starting up."
+
+	^ self preTerminatingInstances 
+		inject: 0
+		into: [ :s :v | s + v coreCount ]
 ]
 
 { #category : #accessing }
@@ -48,14 +63,15 @@ GtAwsAutoScalingGroupDescription >> desiredCapacity [
 	^ jsonObject at: #DesiredCapacity.
 ]
 
-{ #category : #initiailize }
-GtAwsAutoScalingGroupDescription >> initializeGroupName: aString jsonObject: aJsonObject [
+{ #category : #'as yet unclassified' }
+GtAwsAutoScalingGroupDescription >> groupName [
 
-	jsonObject := aJsonObject at: #AutoScalingGroups.
-	self assert: jsonObject size equals: 1.
-	jsonObject := jsonObject first.
-	self assert: (jsonObject at: #AutoScalingGroupName) equals: aString.
-	groupName := aString.
+	^ groupName ifNil: [ jsonObject at: 'AutoScalingGroupName' ]
+]
+
+{ #category : #accessing }
+GtAwsAutoScalingGroupDescription >> groupName: anObject [
+	groupName := anObject
 ]
 
 { #category : #accessing }
@@ -85,12 +101,64 @@ GtAwsAutoScalingGroupDescription >> instancesTerminating [
 		anInstance isTerminating ]
 ]
 
+{ #category : #testing }
+GtAwsAutoScalingGroupDescription >> isIdle [
+	"Answer a boolean indicating whether the receiver's ASG is idle.
+	It isn't idle until the desired capacity is 0 and all the instances are terminating (or gone)"
+
+	^ self desiredCapacity = 0 and: [ self preTerminatingCount = 0 ]
+]
+
+{ #category : #accessing }
+GtAwsAutoScalingGroupDescription >> launchTemplateOverrides [
+
+	^ ((jsonObject at: 'MixedInstancesPolicy') 
+		at: 'LaunchTemplate')
+			at: 'Overrides'
+]
+
 { #category : #accessing }
 GtAwsAutoScalingGroupDescription >> preTerminatingCount [
 	"Answer the number of instances that are either starting or running."
 
 	^ ((jsonObject at: #Instances) reject: [ :each | 
-		#(#Terminating #Terminated) includes: (each at: #LifecycleState) ]) size.
+		(each at: #LifecycleState) beginsWith: 'Terminat' ]) size.
+]
+
+{ #category : #accessing }
+GtAwsAutoScalingGroupDescription >> preTerminatingInstances [
+	"Answer the instances currently running in the ASG."
+
+	^ (jsonObject at: #Instances) 
+		reject: [ :each | 
+			"Terminating lifecycle states: 
+				Terminating:Wait
+				Terminating:Proceed
+				Terminated?"
+			(each at: #LifecycleState) beginsWith: 'Terminat' ]
+		thenCollect: [ :each |
+			LwGtAwsAsgInstance jsonObject: each ].
+]
+
+{ #category : #printing }
+GtAwsAutoScalingGroupDescription >> printOn: aStream [
+	super printOn: aStream.
+	aStream space.
+	aStream parenthesize: 
+			[aStream
+				nextPutAll: self groupName displayString;
+				space ]
+]
+
+{ #category : #accessing }
+GtAwsAutoScalingGroupDescription >> weightForInstanceType: anInstanceType [
+	"Answer the weight assigned to the given instance type for this ASG.
+	Answer nil if the instance type isn't defined in the cluster."
+
+	^ self launchTemplateOverrides
+		detect: [ :each | (each at: 'InstanceType') = anInstanceType ]
+		ifFound: [ :each | (each at: 'WeightedCapacity') asNumber ]
+		ifNone: [ nil ]
 ]
 
 { #category : #accessing }
@@ -99,5 +167,5 @@ GtAwsAutoScalingGroupDescription >> weightInService [
 
 	^ self instancesInService
 		inject: 0
-		into: [ :s :v | s + v weight ].
+		into: [ :s :v | s + v weightedCapacity ].
 ]
