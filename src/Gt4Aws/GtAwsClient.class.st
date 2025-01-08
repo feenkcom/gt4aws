@@ -8,24 +8,51 @@ Class {
 		'defaultRegion',
 		'defaultProfile'
 	],
+	#classVars : [
+		'AwsExecutable'
+	],
 	#category : #'Gt4Aws-Client'
 }
 
 { #category : #accessing }
+GtAwsClient class >> awsExecutable [
+
+	^ AwsExecutable ifNil: [ AwsExecutable := (GtOsSystemInfo current findExecutable: 'aws') fullName ]
+]
+
+{ #category : #initialization }
+GtAwsClient class >> initialize [
+
+	SessionManager default
+		registerUserClassNamed: self name.
+]
+
+{ #category : #initialization }
+GtAwsClient class >> reset [
+
+	AwsExecutable := nil.
+]
+
+{ #category : #initialization }
+GtAwsClient class >> shutDown: quitting [
+
+	quitting ifTrue: [ self reset ]
+]
+
+{ #category : #initialization }
+GtAwsClient class >> startUp: resuming [
+
+	resuming ifTrue: [ self reset ]
+]
+
+{ #category : #accessing }
 GtAwsClient >> awsExecutable [
-	^ awsExecutable
+	^ awsExecutable ifNil: [ self class awsExecutable ].
 ]
 
 { #category : #accessing }
 GtAwsClient >> awsExecutable: anObject [
 	awsExecutable := anObject
-]
-
-{ #category : #'as yet unclassified' }
-GtAwsClient >> defaultAwsExecutable [
-	^ OSPlatform current isWindows
-		ifTrue: [ 'aws.exe' ]
-		ifFalse: [ '/usr/local/bin/aws' ]
 ]
 
 { #category : #accessing }
@@ -71,7 +98,6 @@ GtAwsClient >> initialize [
 	super initialize.
 	
 	monitor := Mutex new.
-	awsExecutable := self defaultAwsExecutable.
 	retryCount := self defaultRetryCount
 ]
 
