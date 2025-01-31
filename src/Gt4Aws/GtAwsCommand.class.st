@@ -2,7 +2,8 @@ Class {
 	#name : #GtAwsCommand,
 	#superclass : #Object,
 	#instVars : [
-		'arguments'
+		'arguments',
+		'retryCount'
 	],
 	#category : #'Gt4Aws-Commands'
 }
