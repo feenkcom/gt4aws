@@ -77,7 +77,7 @@ GtAwsClient >> defaultRegion: anObject [
 
 { #category : #'as yet unclassified' }
 GtAwsClient >> defaultRetryCount [
-	^ 3
+	^ 0
 ]
 
 { #category : #'as yet unclassified' }
