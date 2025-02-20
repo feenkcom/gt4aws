@@ -69,16 +69,6 @@ GtAwsOperationExecutor >> run [
 ]
 
 { #category : #accessing }
-GtAwsOperationExecutor >> service [
-	^ service
-]
-
-{ #category : #accessing }
-GtAwsOperationExecutor >> service: anObject [
-	service := anObject
-]
-
-{ #category : #accessing }
 GtAwsOperationExecutor >> zone [
 	^ zone
 ]
