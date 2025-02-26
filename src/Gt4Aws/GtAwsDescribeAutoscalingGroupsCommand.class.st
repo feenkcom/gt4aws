@@ -23,7 +23,6 @@ GtAwsDescribeAutoscalingGroupsCommand >> initialize [
 
 	super initialize.
 	arguments operation: 'describe-auto-scaling-groups'.
-	retryCount := 2.
 ]
 
 { #category : #'as yet unclassified' }

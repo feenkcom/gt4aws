@@ -118,14 +118,15 @@ GtAwsClient >> run: arguments [
 
 { #category : #'as yet unclassified' }
 GtAwsClient >> runArguments: anArray returnBlock: aBlockOrNil [
-	| proc |
+	| proc exception |
 	proc := GtSubprocessWithInMemoryOutput
 			command: self awsExecutable
 			arguments: anArray asAwsCli.
 	proc
 		retryCount: retryCount;
 		addAllEnvVariablesFromParentWithoutOverride;
-		setDefaultErrorBlock.
+		errorBlock: [ exception := proc pollException.
+			exception ifNotNil: [ exception freeze ] ].
 
 	self defaultRegion
 		ifNotNil: [ :aRegion | proc environmentAt: 'AWS_REGION' put: aRegion ].
@@ -133,9 +134,10 @@ GtAwsClient >> runArguments: anArray returnBlock: aBlockOrNil [
 	self defaultProfile
 		ifNotNil: [ :aProfile | proc environmentAt: 'AWS_PROFILE' put: aProfile ].
 
-	monitor
-		critical: [ self emitAwsCommandStartedSignalWithArguments: anArray.
-			[ proc runAndWait ] ensure: [ self emitAwsCommandEndedSignal ] ].
+	monitor critical: 
+		[ self emitAwsCommandStartedSignalWithArguments: anArray.
+		[ proc runAndWait ] ensure: [ self emitAwsCommandEndedSignal ] ].
 
+	exception ifNotNil: [ self error: 'Exception while running command' ].
 	^ (aBlockOrNil ifNil: [ [ :p | p ] ]) value: proc
 ]
