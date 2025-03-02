@@ -230,20 +230,7 @@ GtAwsAmazonWebServices >> ec2GetInstance: anId [
 GtAwsAmazonWebServices >> ec2InstanceTypes [
 	"Answer a collection of the available instance types."
 
-	| typesArray output instanceTypes |
-	output := self client
-			run: (GtAwsCliArguments new
-					endpointPrefix: 'ec2';
-					operation: 'describe-instance-types').
-
-	typesArray := (STONJSON fromString: output trimBoth) at: #InstanceTypes.
-	instanceTypes := Dictionary new.
-	typesArray
-		do: [ :each | 
-			instanceTypes
-				at: (each at: #InstanceType)
-				put: (GtAwsInstanceType jsonObject: each) ].
-	^ instanceTypes
+	^ GtAwsEc2InstanceTypesCommand new executeWithStonRetry
 ]
 
 { #category : #accessing }

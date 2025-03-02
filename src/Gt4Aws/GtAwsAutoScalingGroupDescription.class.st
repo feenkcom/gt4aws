@@ -137,7 +137,7 @@ GtAwsAutoScalingGroupDescription >> preTerminatingInstances [
 				Terminated?"
 			(each at: #LifecycleState) beginsWith: 'Terminat' ]
 		thenCollect: [ :each |
-			LwGtAwsAsgInstance jsonObject: each ].
+			GtAwsInstance jsonObject: each ].
 ]
 
 { #category : #printing }

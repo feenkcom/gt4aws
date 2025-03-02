@@ -27,11 +27,26 @@ GtAwsCommand >> execute [
 		(self client run: arguments)
 ]
 
+{ #category : #execution }
+GtAwsCommand >> executeWithStonRetry [
+	"Execute the receiver.
+	AWS commands sometimes truncate the output, resulting in a STON parsing error.  Retry in these cases."
+
+	^ [ self execute ]
+		on: STONReaderError
+		do: [ :ex |
+			retryCount := retryCount - 1.
+			retryCount > 0
+				ifTrue: [ 1 second wait. self execute ]
+				ifFalse: [ ex pass ] ].
+]
+
 { #category : #initialization }
 GtAwsCommand >> initialize [
 
 	super initialize.
 	arguments := GtAwsCliArguments new.
+	retryCount := 2.
 ]
 
 { #category : #private }
