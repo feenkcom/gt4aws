@@ -32,7 +32,7 @@ GtAwsDescribeAutoscalingGroupsCommand >> process: aString [
 	dict := STONJSON fromString: aString.
 	^ (result := dict at: 'AutoScalingGroups')
 		ifEmpty: [ KeyNotFound new
-			key: key;
+			key: groupName;
 			signal ]
 		ifNotEmpty: [ result collect: [ :each | GtAwsAutoScalingGroupDescription jsonObject: each ] ]
 ]

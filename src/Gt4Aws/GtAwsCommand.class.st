@@ -46,7 +46,7 @@ GtAwsCommand >> initialize [
 
 	super initialize.
 	arguments := GtAwsCliArguments new.
-	retryCount := 2.
+	retryCount := 0.
 ]
 
 { #category : #private }
