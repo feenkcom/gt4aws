@@ -12,6 +12,6 @@ GtAwsInstanceTypeExamples >> coreCount [
 
 	"This confirms that the data is being accessed correctly.
 	AWS is reporting the wrong value, see #correctedCoreCount"
-	self assert: (GtAwsAmazonWebServices default instanceTypes at: 'm6a.32xlarge') coreCount
+	self assert: (GtAwsAmazonWebServices default ec2 instanceTypes at: 'm6a.32xlarge') coreCount
 		equals: 64.
 ]

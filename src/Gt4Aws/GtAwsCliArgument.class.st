@@ -8,6 +8,14 @@ Class {
 	#category : #'Gt4Aws-Executor'
 }
 
+{ #category : #'instance creation' }
+GtAwsCliArgument class >> key: keyString value: valueString [
+
+	^ self new
+		key: keyString;
+		value: valueString
+]
+
 { #category : #'as yet unclassified' }
 GtAwsCliArgument >> asAwsCli [
 	^ {'--', self key. self value}

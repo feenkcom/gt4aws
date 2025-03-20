@@ -2,21 +2,21 @@ Class {
 	#name : #GtAwsAutoscalingCommand,
 	#superclass : #GtAwsCommand,
 	#instVars : [
-		'key'
+		'groupName'
 	],
 	#category : #'Gt4Aws-Commands'
 }
 
-{ #category : #'as yet unclassified' }
+{ #category : #accessing }
 GtAwsAutoscalingCommand >> groupName: aString [
 
-	key := aString.
-	arguments add: (GtAwsCliArgument new
-		key: 'auto-scaling-group-name';
-		value: aString)
+	groupName := aString.
+	arguments add: (GtAwsCliArgument
+		key: 'auto-scaling-group-name'
+		value: aString).
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #initialization }
 GtAwsAutoscalingCommand >> initialize [
 
 	super initialize.
