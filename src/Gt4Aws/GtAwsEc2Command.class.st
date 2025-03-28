@@ -7,7 +7,7 @@ Class {
 	#category : #'Gt4Aws-Commands'
 }
 
-{ #category : #'as yet unclassified' }
+{ #category : #initialization }
 GtAwsEc2Command >> initialize [
 
 	super initialize.

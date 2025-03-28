@@ -7,12 +7,12 @@ Class {
 	#category : #'Gt4Aws-Executor'
 }
 
-{ #category : #'as yet unclassified' }
+{ #category : #converting }
 GtAwsCliFlag >> asAwsCli [
 	^ {'--' , self name}
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #u }
 GtAwsCliFlag >> gtCliFor: aView [
 	<gtView>
 	^ aView textEditor
@@ -31,7 +31,7 @@ GtAwsCliFlag >> name: anObject [
 	name := anObject
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #printing }
 GtAwsCliFlag >> printOn: aStream [
 	aStream nextPutAll: (' ' join: self asAwsCli)
 ]
