@@ -118,39 +118,31 @@ GtAwsClient >> run: arguments [
 
 { #category : #'as yet unclassified' }
 GtAwsClient >> runArguments: anArray returnBlock: aBlockOrNil [
-	"Run the aws command arguments and pass the result to aBlockOrNil"
-	| builder proc status stdout stderr output |
+	| builder output status |
 
-	builder := (GtExternalProcessBuilder new)
+	builder := GtExternalProcessBuilder new
 		command: self awsExecutable;
 		arguments: anArray asAwsCli;
 		addAllEnvVariablesFromParentWithoutOverride;
 		pipeStderr;
 		pipeStdout.
+
 	self defaultRegion
-		ifNotNil: [:aRegion | builder env: 'AWS_REGION' value: aRegion].
+		ifNotNil: [ :aRegion | builder env: 'AWS_REGION' value: aRegion ].
+
 	self defaultProfile
-		ifNotNil: [:aProfile | builder env: 'AWS_PROFILE' value: aProfile].
+		ifNotNil: [ :aProfile | builder env: 'AWS_PROFILE' value: aProfile ].
+
 	monitor critical: 
-		[self emitAwsCommandStartedSignalWithArguments: anArray.
-		[| command stdoutStream stderrStream |
-		"GtExternalProcess currently blocks if the output is large,
-		e.g. when retrieving all instance types (around 6MB).
-		For now, collect the output in a string."
-		command := builder createNativeCommand.
-		proc := command spawn.
-		stdout := String new writeStream.
-		stderr := String new writeStream.
-		stdoutStream := proc stdoutStream do: [:ch | stdout nextPut: ch].
-		stderrStream := proc stderrStream do: [:ch | stderr nextPut: ch].
-		stdoutStream wait.
-		stderrStream wait. ]
-			ensure: [self emitAwsCommandEndedSignal]].
-	status := proc wait.
-	output := GtExternalProcessOutputHolder
-		status: status
-		stdout: stdout contents
-		stderr: stderr contents.
-	status isSuccess ifFalse: [self error: output stderr trimBoth ].
-	^ (aBlockOrNil ifNil: [[:p | p]]) value: output.
+		[ self emitAwsCommandStartedSignalWithArguments: anArray.
+		[ output := builder asyncOutput wait. ] 
+			ensure: [ self emitAwsCommandEndedSignal ] ].
+
+	status := output status.
+	status isSuccess ifFalse: 
+		[ | message |
+		message := output stderr trimBoth ifEmpty:
+			[ 'Exception while running command' ].
+		self error: message ].
+	^ (aBlockOrNil ifNil: [ [ :p | p ] ]) value: output
 ]

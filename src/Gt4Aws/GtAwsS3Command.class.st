@@ -1,5 +1,5 @@
 Class {
-	#name : #GtAwsEc2Command,
+	#name : #GtAwsS3Command,
 	#superclass : #GtAwsCommand,
 	#instVars : [
 		'key'
@@ -8,8 +8,8 @@ Class {
 }
 
 { #category : #initialization }
-GtAwsEc2Command >> initialize [
+GtAwsS3Command >> initialize [
 
 	super initialize.
-	arguments endpointPrefix: 'ec2'.
+	arguments endpointPrefix: 's3'.
 ]

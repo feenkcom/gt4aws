@@ -16,12 +16,12 @@ GtAwsCliArgument class >> key: keyString value: valueString [
 		value: valueString
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #converting }
 GtAwsCliArgument >> asAwsCli [
 	^ {'--', self key. self value}
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #ui }
 GtAwsCliArgument >> gtCliFor: aView [
 	<gtView>
 	^ aView textEditor
@@ -40,7 +40,7 @@ GtAwsCliArgument >> key: anObject [
 	key := anObject
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #printing }
 GtAwsCliArgument >> printOn: aStream [
 	aStream nextPutAll: (' ' join: self asAwsCli)
 ]
