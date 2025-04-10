@@ -3,7 +3,8 @@ Class {
 	#superclass : #Object,
 	#instVars : [
 		'entities',
-		'services'
+		'services',
+		'mutex'
 	],
 	#category : #'Gt4Aws-Model'
 }
@@ -75,6 +76,13 @@ GtAwsEntityHolder >> gtSearchFunctionsFor: aSearch [
 		itemsLimit: Float infinity;
 		itemName: self entitySearchKey;
 		filterBySubstring
+]
+
+{ #category : #'as yet unclassified' }
+GtAwsEntityHolder >> initialize [
+
+	super initialize.
+	mutex := Mutex new.
 ]
 
 { #category : #accessing }

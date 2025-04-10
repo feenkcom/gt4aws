@@ -57,7 +57,8 @@ GtAwsEc2 >> gtVpcsFor: aView [
 
 { #category : #'as yet unclassified' }
 GtAwsEc2 >> instanceTypes [
-	^ instanceTypes ifNil: [ self refreshInstanceTypes ]
+	^ instanceTypes ifNil: [ mutex critical: [ instanceTypes ifNil: 
+		[ self refreshInstanceTypes ] ] ]
 ]
 
 { #category : #accessing }
@@ -67,7 +68,7 @@ GtAwsEc2 >> refreshEntities [
 
 { #category : #'as yet unclassified' }
 GtAwsEc2 >> refreshInstanceTypes [
-	^ instanceTypes := self client ec2InstanceTypes
+	^ instanceTypes := GtAwsEc2InstanceTypesCommand new executeWithStonRetry
 ]
 
 { #category : #'as yet unclassified' }

@@ -230,7 +230,7 @@ GtAwsAmazonWebServices >> ec2GetInstance: anId [
 GtAwsAmazonWebServices >> ec2InstanceTypes [
 	"Answer a collection of the available instance types."
 
-	^ GtAwsEc2InstanceTypesCommand new executeWithStonRetry
+	^ self ec2 instanceTypes
 ]
 
 { #category : #accessing }
