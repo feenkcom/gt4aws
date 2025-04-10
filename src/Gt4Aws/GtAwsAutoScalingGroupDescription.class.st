@@ -31,6 +31,21 @@ GtAwsAutoScalingGroupDescription >> activeCoreCount [
 ]
 
 { #category : #accessing }
+GtAwsAutoScalingGroupDescription >> arn [
+
+	^ jsonObject at: #AutoScalingGroupARN.
+]
+
+{ #category : #accessing }
+GtAwsAutoScalingGroupDescription >> capacityInService [
+	"Answer the number of cores currently available."
+
+	^ self instancesInService
+		inject: 0
+		into: [ :s :v | s + v weightedCapacity ].
+]
+
+{ #category : #accessing }
 GtAwsAutoScalingGroupDescription >> coreCount [
 	"Answer the number of cores currently available."
 
@@ -148,6 +163,12 @@ GtAwsAutoScalingGroupDescription >> printOn: aStream [
 			[aStream
 				nextPutAll: self groupName displayString;
 				space ]
+]
+
+{ #category : #accessing }
+GtAwsAutoScalingGroupDescription >> regionName [
+
+	^ (self arn splitOn: $:) fourth
 ]
 
 { #category : #accessing }
