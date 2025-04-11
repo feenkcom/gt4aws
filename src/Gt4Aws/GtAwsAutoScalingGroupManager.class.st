@@ -38,6 +38,13 @@ GtAwsAutoScalingGroupManager >> descriptionCache [
 ]
 
 { #category : #accessing }
+GtAwsAutoScalingGroupManager >> descriptionState [
+	"Answer the time at which the description cache was retrieved"
+
+	^ descriptionCache state
+]
+
+{ #category : #accessing }
 GtAwsAutoScalingGroupManager >> groupName [
 	^groupName
 ]
@@ -55,7 +62,7 @@ GtAwsAutoScalingGroupManager >> isIdle [
 	^ self waitForDescription isIdle
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #accessing }
 GtAwsAutoScalingGroupManager >> lastRetrievedTime [
 	"Answer the time at which the description cache was retrieved"
 	

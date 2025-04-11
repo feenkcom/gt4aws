@@ -33,6 +33,21 @@ GtAwsMultiRegionAsgManager >> announcer [
 ]
 
 { #category : #accessing }
+GtAwsMultiRegionAsgManager >> descriptionState [
+	"Answer the combined state of the receiver's descriptions"
+	| states index statesRanking |
+
+	"Iterating over the #values takes a copy of the collection, 
+	removing the need to use the mutex."
+	states := regionManagers values collect: #descriptionState.
+	states ifEmpty: [ ^ #none ].
+	index := SmallInteger maxVal.
+	statesRanking := #(none stopped stale current).
+	states do: [ :state | index := index min: (statesRanking indexOf: state) ].
+	^ statesRanking at: (index max: 1)
+]
+
+{ #category : #accessing }
 GtAwsMultiRegionAsgManager >> groupDescriptions [
 	"Answer the group descriptions.
 	Keep the description cache alive for each individual region."
