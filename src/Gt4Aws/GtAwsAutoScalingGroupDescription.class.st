@@ -133,6 +133,18 @@ GtAwsAutoScalingGroupDescription >> launchTemplateOverrides [
 ]
 
 { #category : #accessing }
+GtAwsAutoScalingGroupDescription >> maxCapacity [
+
+	^ jsonObject at: #MaxSize
+]
+
+{ #category : #accessing }
+GtAwsAutoScalingGroupDescription >> minCapacity [
+
+	^ jsonObject at: #MinSize
+]
+
+{ #category : #accessing }
 GtAwsAutoScalingGroupDescription >> preTerminatingCount [
 	"Answer the number of instances that are either starting or running."
 
