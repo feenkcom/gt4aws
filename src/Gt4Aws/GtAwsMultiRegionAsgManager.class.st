@@ -34,16 +34,18 @@ GtAwsMultiRegionAsgManager >> announcer [
 
 { #category : #accessing }
 GtAwsMultiRegionAsgManager >> descriptionState [
-	"Answer the combined state of the receiver's descriptions"
+	"Answer the effective state of the receiver's descriptions.
+	This is the least confident value from the individual regions."
 	| states index statesRanking |
 
-	"Iterating over the #values takes a copy of the collection, 
+	"Iterating over the #values takes a copy of the dictionary,
 	removing the need to use the mutex."
 	states := regionManagers values collect: #descriptionState.
 	states ifEmpty: [ ^ #none ].
 	index := SmallInteger maxVal.
 	statesRanking := #(none stopped stale current).
-	states do: [ :state | index := index min: (statesRanking indexOf: state) ].
+	states do: [ :state |
+		index := index min: (statesRanking indexOf: state) ].
 	^ statesRanking at: (index max: 1)
 ]
 

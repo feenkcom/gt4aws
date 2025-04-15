@@ -40,7 +40,7 @@ GtAwsAutoScalingGroupManager >> descriptionCache [
 { #category : #accessing }
 GtAwsAutoScalingGroupManager >> descriptionState [
 	"Answer the time at which the description cache was retrieved"
-
+	
 	^ descriptionCache state
 ]
 
