@@ -51,6 +51,36 @@ GtAwsAmazonWebServices >> client: anObject [
 	client := anObject
 ]
 
+{ #category : #accessing }
+GtAwsAmazonWebServices >> cloudWatchWeeklyCpuDataFor: anInstanceId [
+	| endTime startTime output |
+	endTime := DateAndTime now.
+	startTime := endTime - 7 days.
+
+	output := self client
+			run: {'cloudwatch'.
+					'get-metric-statistics'.
+					'--namespace'.
+					'AWS/EC2'.
+					'--period'.
+					'600'.
+					'--start-time'.
+					startTime asString.
+					'--end-time'.
+					endTime asString.
+					'--metric-name'.
+					'CPUUtilization'.
+					'--statistics'.
+					'Maximum'.
+					'--dimensions'.
+					'Name = InstanceId, Value = ' , anInstanceId}.
+
+	^ GtAwsCloudWatchMaximumDataPointGroup
+		withAll: ((((STONJSON fromString: output) at: 'Datapoints')
+				collect: [ :aDict | (GtAwsCloudwatchMaximumDataPoint fromDictionary: aDict) client: self ])
+				sorted: [ :a :b | a timestamp < b timestamp ])
+]
+
 { #category : #cloudformation }
 GtAwsAmazonWebServices >> cloudformation [
 	"Model and provision all your cloud infrastructure"
@@ -90,36 +120,6 @@ GtAwsAmazonWebServices >> cloudformationListStacks [
 			collect: [ :aDict | (GtAwsCloudformationStack fromDictionary: aDict) client: self ].
 
 	^ GtAwsCloudformationStackGroup withAll: aCollection
-]
-
-{ #category : #accessing }
-GtAwsAmazonWebServices >> cloudWatchWeeklyCpuDataFor: anInstanceId [
-	| endTime startTime output |
-	endTime := DateAndTime now.
-	startTime := endTime - 7 days.
-
-	output := self client
-			run: {'cloudwatch'.
-					'get-metric-statistics'.
-					'--namespace'.
-					'AWS/EC2'.
-					'--period'.
-					'600'.
-					'--start-time'.
-					startTime asString.
-					'--end-time'.
-					endTime asString.
-					'--metric-name'.
-					'CPUUtilization'.
-					'--statistics'.
-					'Maximum'.
-					'--dimensions'.
-					'Name = InstanceId, Value = ' , anInstanceId}.
-
-	^ GtAwsCloudWatchMaximumDataPointGroup
-		withAll: ((((STONJSON fromString: output) at: 'Datapoints')
-				collect: [ :aDict | (GtAwsCloudwatchMaximumDataPoint fromDictionary: aDict) client: self ])
-				sorted: [ :a :b | a timestamp < b timestamp ])
 ]
 
 { #category : #'gt - extensions' }
@@ -413,20 +413,6 @@ GtAwsAmazonWebServices >> lambdaGetFunction: anId [
 ]
 
 { #category : #accessing }
-GtAwsAmazonWebServices >> lambdaListFunctions [
-	| output aCollection |
-	output := self client
-			run: (GtAwsCliArguments new
-					endpointPrefix: 'lambda';
-					operation: 'list-functions').
-
-	aCollection := ((STONJSON fromString: output) at: 'Functions')
-			collect: [ :aDict | (GtAwsLambdaFunction fromDictionary: aDict) client: self ].
-
-	^ GtAwsLambdaFunctionGroup withAll: aCollection
-]
-
-{ #category : #accessing }
 GtAwsAmazonWebServices >> lambdaListFunctionTagsFor: anArn [
 	| output |
 	output := self client
@@ -438,6 +424,20 @@ GtAwsAmazonWebServices >> lambdaListFunctionTagsFor: anArn [
 								value: anArn)).
 
 	^ (STONJSON fromString: output) at: 'Tags'
+]
+
+{ #category : #accessing }
+GtAwsAmazonWebServices >> lambdaListFunctions [
+	| output aCollection |
+	output := self client
+			run: (GtAwsCliArguments new
+					endpointPrefix: 'lambda';
+					operation: 'list-functions').
+
+	aCollection := ((STONJSON fromString: output) at: 'Functions')
+			collect: [ :aDict | (GtAwsLambdaFunction fromDictionary: aDict) client: self ].
+
+	^ GtAwsLambdaFunctionGroup withAll: aCollection
 ]
 
 { #category : #'gt - extensions' }
