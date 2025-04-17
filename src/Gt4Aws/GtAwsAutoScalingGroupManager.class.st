@@ -54,6 +54,18 @@ GtAwsAutoScalingGroupManager >> groupName: anObject [
 	groupName := anObject
 ]
 
+{ #category : #ui }
+GtAwsAutoScalingGroupManager >> gtSummaryFor: aView [
+	<gtView>
+
+	descriptionCache ifNil: [ ^ aView empty ].
+	^ aView forward
+		title: 'Summary';
+		priority: 10;
+		object: [ descriptionCache ];
+		view: #gtSummaryFor:
+]
+
 { #category : #testing }
 GtAwsAutoScalingGroupManager >> isIdle [
 	"Answer a boolean indicating if the receiver is idle.
