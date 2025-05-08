@@ -96,13 +96,16 @@ GtAwsAutoScalingGroupManager >> waitForDescription [
 	"Answer the receiver's description, waiting if it isn't yet available."
 	| maxRetries retryCount delay description |
 
-	maxRetries := 9.
-	delay := 1 second.
-	retryCount := 0.
-	[ description := self description.
-	description isNil and: [ retryCount <= maxRetries ]. ] whileTrue:
-		[ retryCount := retryCount + 1.
-		delay wait. ].
+	descriptionCache isStale ifTrue:
+		[ maxRetries := 9.
+		delay := 1 second.
+		retryCount := 0.
+
+		descriptionCache keepAlive.
+		[ descriptionCache isStale and: [ retryCount <= maxRetries ]. ] whileTrue:
+			[ retryCount := retryCount + 1.
+			delay wait. ] ].
+	description := self description.
 	description ifNil:
 		[ self error: 'Unable to retrieve description' ].
 	^ description
