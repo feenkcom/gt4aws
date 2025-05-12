@@ -1,18 +1,18 @@
 Class {
-	#name : #GtAwsDescribeAutoscalingGroupActivitiesCommand,
+	#name : #GtAwsDescribeAutoscalingGroupActivityCommand,
 	#superclass : #GtAwsAutoscalingCommand,
 	#category : #'Gt4Aws-Commands'
 }
 
 { #category : #initialization }
-GtAwsDescribeAutoscalingGroupActivitiesCommand >> initialize [
+GtAwsDescribeAutoscalingGroupActivityCommand >> initialize [
 
 	super initialize.
 	arguments operation: 'describe-scaling-activities'.
 ]
 
 { #category : #accessing }
-GtAwsDescribeAutoscalingGroupActivitiesCommand >> maxItems: aNumber [
+GtAwsDescribeAutoscalingGroupActivityCommand >> maxItems: aNumber [
 
 	arguments add: (GtAwsCliArgument new
 		key: 'max-items';
@@ -20,7 +20,7 @@ GtAwsDescribeAutoscalingGroupActivitiesCommand >> maxItems: aNumber [
 ]
 
 { #category : #private }
-GtAwsDescribeAutoscalingGroupActivitiesCommand >> process: aString [
+GtAwsDescribeAutoscalingGroupActivityCommand >> process: aString [
 	| dict result |
 
 	dict := STONJSON fromString: aString.
