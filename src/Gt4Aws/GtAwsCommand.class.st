@@ -37,7 +37,7 @@ GtAwsCommand >> executeWithStonRetry [
 		do: [ :ex |
 			retryCount := retryCount - 1.
 			retryCount > 0
-				ifTrue: [ 1 second wait. self execute ]
+				ifTrue: [ 1 second wait. self executeWithStonRetry ]
 				ifFalse: [ ex pass ] ].
 ]
 
