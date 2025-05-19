@@ -9,8 +9,56 @@ Class {
 		'regionName',
 		'groupName'
 	],
+	#classVars : [
+		'DescriptionCaches',
+		'DescriptionMutex'
+	],
 	#category : #'Gt4Aws-Management'
 }
+
+{ #category : #accessing }
+GtAwsAutoScalingGroupManager class >> descriptionCacheForRegion: aString [
+
+	^ self descriptionMutex critical:
+		[ self descriptionCaches at: aString ifAbsentPut:
+			 [] ]
+]
+
+{ #category : #accessing }
+GtAwsAutoScalingGroupManager class >> descriptionCacheForRegion: regionName group: groupName [
+
+	^ self descriptionMutex critical:
+		[ self descriptionCaches 
+			at: (self descriptionKeyForRegion: regionName group: groupName) 
+			ifAbsentPut:  [ GtUpdatingTimeCachedObject 
+				get: [ [ (GtAwsDescribeAutoscalingGroupsCommand new 
+						groupName: groupName;
+						region: regionName;
+						executeWithStonRetry) first ]
+							on: Error
+							do: [ :ex | GtRrWorker isCommandLineWorker
+								ifFalse: [ ex pass ] ] ]
+				timeout: 20 seconds
+				active: 5 minutes ] ]
+]
+
+{ #category : #'private - accessing' }
+GtAwsAutoScalingGroupManager class >> descriptionCaches [
+
+	^ DescriptionCaches ifNil: [ DescriptionCaches := Dictionary new ]
+]
+
+{ #category : #'private - accessing' }
+GtAwsAutoScalingGroupManager class >> descriptionKeyForRegion: regionName group: groupName [
+
+	^ regionName -> groupName
+]
+
+{ #category : #'private - accessing' }
+GtAwsAutoScalingGroupManager class >> descriptionMutex [
+
+	^ DescriptionMutex ifNil: [ DescriptionMutex := Mutex new ]
+]
 
 { #category : #accessing }
 GtAwsAutoScalingGroupManager >> description [
@@ -25,16 +73,8 @@ GtAwsAutoScalingGroupManager >> descriptionCache [
 	"Answer a description of the cluster.  
 	This is an expensive operation and changes relatively rarely, so is cached for the time specified below."
 
-	^ descriptionCache ifNil: [ descriptionCache := GtUpdatingTimeCachedObject 
-		get: [ [ (GtAwsDescribeAutoscalingGroupsCommand new 
-				groupName: groupName;
-				region: regionName;
-				executeWithStonRetry) first ]
-					on: Error
-					do: [ :ex | GtRrWorker isCommandLineWorker
-						ifFalse: [ ex pass ] ] ]
-		timeout: 20 seconds
-		active: 5 minutes ]
+	^ descriptionCache ifNil: [ descriptionCache := 
+		self class descriptionCacheForRegion: regionName group: groupName ]
 ]
 
 { #category : #accessing }
