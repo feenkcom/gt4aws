@@ -31,14 +31,20 @@ GtAwsCommand >> execute [
 GtAwsCommand >> executeWithStonRetry [
 	"Execute the receiver.
 	AWS commands sometimes truncate the output, resulting in a STON parsing error.  Retry in these cases."
+	| retryDelay |
 
+	retryDelay := 1.
 	^ [ self execute ]
 		on: STONReaderError
 		do: [ :ex |
 			retryCount := retryCount - 1.
-			retryCount > 0
-				ifTrue: [ 1 second wait. self executeWithStonRetry ]
-				ifFalse: [ ex pass ] ].
+			retryCount > 0 ifTrue: 
+				[ retryDelay <= 16 ifTrue:
+					[ retryDelay := retryDelay * 2 ].
+				retryDelay seconds wait. 
+				self executeWithStonRetry ]
+			ifFalse: 
+				[ ex pass ] ].
 ]
 
 { #category : #initialization }

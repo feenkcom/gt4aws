@@ -81,8 +81,13 @@ GtAwsClient >> defaultRetryCount [
 ]
 
 { #category : #'as yet unclassified' }
-GtAwsClient >> emitAwsCommandEndedSignal [
-	(GtAwsWebServiceCommandEndSignal new) emit
+GtAwsClient >> emitAwsCommandEndedSignalWithArguments: anArray [
+
+	GtAwsWebServiceCommandEndSignal new
+		arguments: anArray;
+		retryCount: retryCount;
+		executableName: self awsExecutable;
+		emit
 ]
 
 { #category : #'as yet unclassified' }
@@ -136,7 +141,7 @@ GtAwsClient >> runArguments: anArray returnBlock: aBlockOrNil [
 	monitor critical: 
 		[ self emitAwsCommandStartedSignalWithArguments: anArray.
 		[ output := builder asyncOutput wait. ] 
-			ensure: [ self emitAwsCommandEndedSignal ] ].
+			ensure: [ self emitAwsCommandEndedSignalWithArguments: anArray ] ].
 
 	status := output status.
 	status isSuccess ifFalse: 
