@@ -86,14 +86,14 @@ GtAwsWebServiceCommandSignal >> isStartSignalType [
 { #category : #printing }
 GtAwsWebServiceCommandSignal >> printOneLineContentsOn: stream [
 	stream 
-		nextPut: $|; space;
+		<< ' | ';
 		nextPutAll: 'AwsEvent';
-		space; nextPut: $|; space;
-		nextPutAll: executableName;
-		space; nextPut: $|; space;
+		<< ' | ';
+		nextPutAll: executableName asString;
+		<< ' | ';
 		nextPutAll: arguments storeString;
-		space; nextPut: $|; space;
-		nextPutAll: self processId
+		<< ' | ';
+		nextPutAll: self processId asString
 ]
 
 { #category : #accessing }
