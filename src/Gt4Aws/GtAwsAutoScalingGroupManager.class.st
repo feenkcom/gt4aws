@@ -17,27 +17,19 @@ Class {
 }
 
 { #category : #accessing }
-GtAwsAutoScalingGroupManager class >> descriptionCacheForRegion: aString [
-
-	^ self descriptionMutex critical:
-		[ self descriptionCaches at: aString ifAbsentPut:
-			 [] ]
-]
-
-{ #category : #accessing }
 GtAwsAutoScalingGroupManager class >> descriptionCacheForRegion: regionName group: groupName [
 
-	^ self descriptionMutex critical:
-		[ self descriptionCaches 
-			at: (self descriptionKeyForRegion: regionName group: groupName) 
-			ifAbsentPut:  [ GtUpdatingTimeCachedObject 
-				get: [ [ (GtAwsDescribeAutoscalingGroupsCommand new 
+	^ self descriptionMutex critical: [ self descriptionCaches
+		at: (self descriptionKeyForRegion: regionName group: groupName)
+		ifAbsentPut: [ | cacheObject |
+			cacheObject := GtUpdatingTimeCachedObject
+				get: [ GtRrWorker isCommandLineWorker ifTrue: 
+					[ cacheObject stop.
+					Processor activeProcess terminate ].
+					(GtAwsDescribeAutoscalingGroupsCommand new
 						groupName: groupName;
 						region: regionName;
 						executeWithStonRetry) first ]
-							on: Error
-							do: [ :ex | GtRrWorker isCommandLineWorker
-								ifFalse: [ ex pass ] ] ]
 				timeout: 20 seconds
 				active: 5 minutes ] ]
 ]
