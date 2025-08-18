@@ -68,7 +68,8 @@ GtAwsEc2 >> refreshEntities [
 
 { #category : #'as yet unclassified' }
 GtAwsEc2 >> refreshInstanceTypes [
-	^ instanceTypes := GtAwsEc2InstanceTypesCommand new executeWithStonRetry
+	^ instanceTypes := (GtAwsEc2InstanceTypesCommand new
+		retryCount: 2) executeWithStonRetry
 ]
 
 { #category : #'as yet unclassified' }
