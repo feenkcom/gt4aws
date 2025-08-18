@@ -76,3 +76,12 @@ GtAwsCommand >> region: aString [
 		key: 'region';
 		value: aString)
 ]
+
+{ #category : #accessing }
+GtAwsCommand >> retryCount: anInteger [ 
+	self 
+		assert: [ anInteger >= 0 ]
+		description: 'Cannot set a negative retry count'.
+		
+	retryCount := anInteger 
+]
