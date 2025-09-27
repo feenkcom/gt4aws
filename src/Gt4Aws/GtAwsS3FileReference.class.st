@@ -96,8 +96,8 @@ GtAwsS3FileReference >> gtItemsFor: aView [
 		column: 'Icon' translated 
 			icon: [ :each | 
 				each isDirectory
-					ifTrue: [ BrGlamorousIcons folder ]
-					ifFalse: [ BrGlamorousIcons file ] ];
+					ifTrue: [ BrGlamorousVectorIcons folder ]
+					ifFalse: [ BrGlamorousVectorIcons file ] ];
 		column: 'Name' translated text: [ :each | 
 			each basename ];
 		column: 'Size' translated
