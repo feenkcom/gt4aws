@@ -5,7 +5,7 @@ Class {
 		'arguments',
 		'retryCount'
 	],
-	#category : #'Gt4Aws-Commands'
+	#category : 'Gt4Aws-Commands'
 }
 
 { #category : #accessing }

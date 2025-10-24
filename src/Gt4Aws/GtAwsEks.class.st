@@ -1,7 +1,7 @@
 Class {
 	#name : #GtAwsEks,
 	#superclass : #GtAwsEntityHolder,
-	#category : #'Gt4Aws-Model'
+	#category : 'Gt4Aws-Model'
 }
 
 { #category : #accessing }

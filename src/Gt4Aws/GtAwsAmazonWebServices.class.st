@@ -9,7 +9,7 @@ Class {
 	#classInstVars : [
 		'uniqueInstance'
 	],
-	#category : #'Gt4Aws-Client'
+	#category : 'Gt4Aws-Client'
 }
 
 { #category : #testing }
@@ -51,36 +51,6 @@ GtAwsAmazonWebServices >> client: anObject [
 	client := anObject
 ]
 
-{ #category : #accessing }
-GtAwsAmazonWebServices >> cloudWatchWeeklyCpuDataFor: anInstanceId [
-	| endTime startTime output |
-	endTime := DateAndTime now.
-	startTime := endTime - 7 days.
-
-	output := self client
-			run: {'cloudwatch'.
-					'get-metric-statistics'.
-					'--namespace'.
-					'AWS/EC2'.
-					'--period'.
-					'600'.
-					'--start-time'.
-					startTime asString.
-					'--end-time'.
-					endTime asString.
-					'--metric-name'.
-					'CPUUtilization'.
-					'--statistics'.
-					'Maximum'.
-					'--dimensions'.
-					'Name = InstanceId, Value = ' , anInstanceId}.
-
-	^ GtAwsCloudWatchMaximumDataPointGroup
-		withAll: ((((STONJSON fromString: output) at: 'Datapoints')
-				collect: [ :aDict | (GtAwsCloudwatchMaximumDataPoint fromDictionary: aDict) client: self ])
-				sorted: [ :a :b | a timestamp < b timestamp ])
-]
-
 { #category : #cloudformation }
 GtAwsAmazonWebServices >> cloudformation [
 	"Model and provision all your cloud infrastructure"
@@ -120,6 +90,36 @@ GtAwsAmazonWebServices >> cloudformationListStacks [
 			collect: [ :aDict | (GtAwsCloudformationStack fromDictionary: aDict) client: self ].
 
 	^ GtAwsCloudformationStackGroup withAll: aCollection
+]
+
+{ #category : #accessing }
+GtAwsAmazonWebServices >> cloudWatchWeeklyCpuDataFor: anInstanceId [
+	| endTime startTime output |
+	endTime := DateAndTime now.
+	startTime := endTime - 7 days.
+
+	output := self client
+			run: {'cloudwatch'.
+					'get-metric-statistics'.
+					'--namespace'.
+					'AWS/EC2'.
+					'--period'.
+					'600'.
+					'--start-time'.
+					startTime asString.
+					'--end-time'.
+					endTime asString.
+					'--metric-name'.
+					'CPUUtilization'.
+					'--statistics'.
+					'Maximum'.
+					'--dimensions'.
+					'Name = InstanceId, Value = ' , anInstanceId}.
+
+	^ GtAwsCloudWatchMaximumDataPointGroup
+		withAll: ((((STONJSON fromString: output) at: 'Datapoints')
+				collect: [ :aDict | (GtAwsCloudwatchMaximumDataPoint fromDictionary: aDict) client: self ])
+				sorted: [ :a :b | a timestamp < b timestamp ])
 ]
 
 { #category : #'gt - extensions' }
@@ -413,20 +413,6 @@ GtAwsAmazonWebServices >> lambdaGetFunction: anId [
 ]
 
 { #category : #accessing }
-GtAwsAmazonWebServices >> lambdaListFunctionTagsFor: anArn [
-	| output |
-	output := self client
-			run: (GtAwsCliArguments new
-					endpointPrefix: 'lambda';
-					operation: 'list-tags';
-					add: (GtAwsCliArgument new
-								key: 'resource';
-								value: anArn)).
-
-	^ (STONJSON fromString: output) at: 'Tags'
-]
-
-{ #category : #accessing }
 GtAwsAmazonWebServices >> lambdaListFunctions [
 	| output aCollection |
 	output := self client
@@ -438,6 +424,20 @@ GtAwsAmazonWebServices >> lambdaListFunctions [
 			collect: [ :aDict | (GtAwsLambdaFunction fromDictionary: aDict) client: self ].
 
 	^ GtAwsLambdaFunctionGroup withAll: aCollection
+]
+
+{ #category : #accessing }
+GtAwsAmazonWebServices >> lambdaListFunctionTagsFor: anArn [
+	| output |
+	output := self client
+			run: (GtAwsCliArguments new
+					endpointPrefix: 'lambda';
+					operation: 'list-tags';
+					add: (GtAwsCliArgument new
+								key: 'resource';
+								value: anArn)).
+
+	^ (STONJSON fromString: output) at: 'Tags'
 ]
 
 { #category : #'gt - extensions' }
@@ -582,8 +582,8 @@ GtAwsAmazonWebServices >> s3ls: aString [
 	aString must be in the format of a s3 URL, i.e. s3://path/to/dir.
 	For now answer { file name string. file size string. file date string. }
 	Directories have a trailing slash (/), 0 size and nil date."
+	| output files fileRx directoryRx parentUrl |
 
-	| output files fileRx directoryRx |
 	output := self client
 			run: {'s3'.
 					'ls'.
@@ -591,27 +591,55 @@ GtAwsAmazonWebServices >> s3ls: aString [
 
 	fileRx := '([0-9\-]+ [0-9:]+) +(\d+) +(.+)' asRegex.
 	directoryRx := ' *PRE (.+)' asRegex.
-	files := Array
-			streamContents: [ :stream | 
-				output
-					linesDo: [ :each | 
-						| search |
-						search := fileRx search: each.
-						search
-							ifTrue: [ stream
-									nextPut: (GtAwsS3FileReference new
-											s3DirectoryUrl: aString;
-											basename: (fileRx subexpressions: 4) first;
-											size: (fileRx subexpressions: 3) first asNumber;
-											modificationTime: (fileRx subexpressions: 2) first) ].
-						search := directoryRx search: each.
-						search
-							ifTrue: [ stream
-									nextPut: (GtAwsS3FileReference new
-											s3DirectoryUrl: aString;
-											basename: (directoryRx subexpressions: 2) first;
-											size: 0) ] ] ].
+	parentUrl := aString last = $/ 
+		ifTrue: [ aString ]
+		ifFalse: [ '' ].
+	files := Array streamContents: [ :stream | 
+		output linesDo: [ :each | | search |
+			search := fileRx search: each.
+			search ifTrue: [ stream nextPut: (GtAwsS3CachingFileReference new
+								s3Url: parentUrl, (fileRx subexpressions: 4) first;
+								size: (fileRx subexpressions: 3) first asNumber;
+								modificationTime: (fileRx subexpressions: 2) first) ].
+			search := directoryRx search: each.
+			search ifTrue: [ stream nextPut: (GtAwsS3CachingFileReference new
+								s3Url: parentUrl, (directoryRx subexpressions: 2) first;
+								size: 0) ] ] ].
 	^ files
+]
+
+{ #category : #accessing }
+GtAwsAmazonWebServices >> s3ls: aString region: regionString [
+	"Answer the contents of the supplied S3 bucket.
+	aString must be in the format of a s3 URL, i.e. s3://path/to/dir.
+	For now answer { file name string. file size string. file date string. }
+	Directories have a trailing slash (/), 0 size and nil date."
+	| lsString files fileRx directoryRx parentUrl |
+
+	lsString := self client
+			run: {'s3'.
+					'--region'.
+					regionString.
+					'ls'.
+					aString}.
+
+	fileRx := '([0-9\-]+ [0-9:]+) +(\d+) +(.+)' asRegex.
+	directoryRx := ' *PRE (.+)' asRegex.
+	parentUrl := aString last = $/ 
+		ifTrue: [ aString ]
+		ifFalse: [ '' ].
+	files := Array streamContents: [ :stream |
+		lsString linesDo: [ :each | | search |
+			search := fileRx search: each.
+			search ifTrue: [ stream nextPut: ((GtAwsS3CachingFileReference new)
+								s3Url: parentUrl , (fileRx subexpressions: 4) first;
+								size: (fileRx subexpressions: 3) first asNumber;
+								modificationTime: (fileRx subexpressions: 2) first)].
+			search := directoryRx search: each.
+			search ifTrue: [ stream nextPut: ((GtAwsS3CachingFileReference new)
+								s3Url: aString , (directoryRx subexpressions: 2) first;
+								size: 0)]]].
+	^files
 ]
 
 { #category : #accessing }

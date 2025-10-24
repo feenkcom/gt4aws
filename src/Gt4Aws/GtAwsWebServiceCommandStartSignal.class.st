@@ -1,7 +1,7 @@
 Class {
 	#name : #GtAwsWebServiceCommandStartSignal,
 	#superclass : #GtAwsWebServiceCommandSignal,
-	#category : #'Gt4Aws-Logging'
+	#category : 'Gt4Aws-Logging'
 }
 
 { #category : #testing }

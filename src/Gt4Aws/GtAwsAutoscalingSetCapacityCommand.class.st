@@ -1,7 +1,7 @@
 Class {
 	#name : #GtAwsAutoscalingSetCapacityCommand,
 	#superclass : #GtAwsAutoscalingCommand,
-	#category : #'Gt4Aws-Commands'
+	#category : 'Gt4Aws-Commands'
 }
 
 { #category : #accessing }

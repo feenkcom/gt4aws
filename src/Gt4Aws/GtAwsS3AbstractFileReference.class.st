@@ -2,11 +2,10 @@ Class {
 	#name : #GtAwsS3AbstractFileReference,
 	#superclass : #Object,
 	#instVars : [
-		'modificationTime',
 		'parent',
 		's3Url'
 	],
-	#category : #'Gt4Aws-Model'
+	#category : 'Gt4Aws-Model'
 }
 
 { #category : #accessing }
@@ -158,13 +157,9 @@ GtAwsS3AbstractFileReference >> isFile [
 
 { #category : #accessing }
 GtAwsS3AbstractFileReference >> modificationTime [
-	^ modificationTime
-]
 
-{ #category : #accessing }
-GtAwsS3AbstractFileReference >> modificationTime: anObject [
-
-	modificationTime := anObject asDateAndTime
+	self isDirectory ifTrue: [ ^ nil ].
+	^ (GtAwsAmazonWebServices default s3ls: s3Url) first modificationTime
 ]
 
 { #category : #accessing }

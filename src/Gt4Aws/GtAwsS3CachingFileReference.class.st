@@ -3,24 +3,29 @@ Class {
 	#superclass : #GtAwsS3AbstractFileReference,
 	#instVars : [
 		'cacheFile',
-		'size'
+		'size',
+		'modificationTime'
 	],
-	#category : #'Gt4Aws-Model'
+	#category : 'Gt4Aws-Model'
 }
 
 { #category : #converting }
 GtAwsS3CachingFileReference >> asFileReference [
 
-	(cacheFile isNil or: [ cacheFile exists not ]) ifTrue:
-		[ self downloadContents ].
+	self ensureContents.
 	^ cacheFile
+]
+
+{ #category : #converting }
+GtAwsS3CachingFileReference >> asNonCachingS3FileReference [
+
+	^ GtAwsS3FileReference s3Url: s3Url
 ]
 
 { #category : #accessing }
 GtAwsS3CachingFileReference >> binaryContents [
 
-	(cacheFile isNil or: [ cacheFile exists not ]) ifTrue:
-		[ self downloadContents ].
+	self ensureContents.
 	^ cacheFile binaryContents
 ]
 
@@ -48,24 +53,45 @@ GtAwsS3CachingFileReference >> clearCache [
 
 	cacheFile ifNotNil:
 		[ cacheFile ensureDelete ].
+	size := nil.
+	modificationTime := nil.
 ]
 
 { #category : #accessing }
 GtAwsS3CachingFileReference >> contents [
 
-	(cacheFile isNil or: [ cacheFile exists not ]) ifTrue:
-		[ self downloadContents ].
+	self ensureContents.
 	^ cacheFile readStreamDo: [ :stream |
 		stream encoder: ZnLossyUTF8Encoder new.
 		stream upToEnd ].
 ]
 
 { #category : #accessing }
-GtAwsS3CachingFileReference >> downloadContents [
+GtAwsS3CachingFileReference >> ensureContents [
 
 	self cacheFile exists ifTrue: [ ^ self ].
 	self class s3CacheDirectory ensureCreateDirectory.
 	GtAwsAmazonWebServices default s3Cp: self s3Url to: self cacheFile asAbsolute fullName.
+]
+
+{ #category : #accessing }
+GtAwsS3CachingFileReference >> modificationTime [
+
+	^ modificationTime ifNil: [ modificationTime := super modificationTime ]
+]
+
+{ #category : #accessing }
+GtAwsS3CachingFileReference >> modificationTime: anObject [
+
+	modificationTime := anObject asDateAndTime
+]
+
+{ #category : #accessing }
+GtAwsS3CachingFileReference >> size [ 
+
+	^ size ifNil: 
+		[ self ensureContents.
+		size := cacheFile size ]
 ]
 
 { #category : #accessing }
