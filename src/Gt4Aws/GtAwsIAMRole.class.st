@@ -9,7 +9,7 @@ Class {
 		'maxSessionDuration',
 		'path'
 	],
-	#category : #'Gt4Aws-Model'
+	#category : 'Gt4Aws-Model'
 }
 
 { #category : #accessing }

@@ -4,7 +4,7 @@ Class {
 	#instVars : [
 		'signalTypeIndicator'
 	],
-	#category : #'Gt4Aws-Logging'
+	#category : 'Gt4Aws-Logging'
 }
 
 { #category : #api }

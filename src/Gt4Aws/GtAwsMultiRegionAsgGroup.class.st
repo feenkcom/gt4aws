@@ -4,7 +4,7 @@ The intention is that GtAwsMultiRegionAsgGroup eventually provides the ability t
 Class {
 	#name : #GtAwsMultiRegionAsgGroup,
 	#superclass : #GtAwsGroup,
-	#category : #'Gt4Aws-Model'
+	#category : 'Gt4Aws-Model'
 }
 
 { #category : #accessing }

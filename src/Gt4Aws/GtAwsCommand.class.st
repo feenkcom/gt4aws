@@ -3,9 +3,10 @@ Class {
 	#superclass : #Object,
 	#instVars : [
 		'arguments',
-		'retryCount'
+		'retryCount',
+		'awsClient'
 	],
-	#category : #'Gt4Aws-Commands'
+	#category : 'Gt4Aws-Commands'
 }
 
 { #category : #accessing }
@@ -17,32 +18,34 @@ GtAwsCommand >> arguments [
 { #category : #accessing }
 GtAwsCommand >> client [
 
-	^ GtAwsClient new
+	^ awsClient
 ]
 
 { #category : #execution }
 GtAwsCommand >> execute [
 
-	^ self process:
-		(self client run: arguments)
+	awsClient := GtAwsClient new.
+	^ self process: (awsClient run: arguments)
 ]
 
 { #category : #execution }
 GtAwsCommand >> executeWithStonRetry [
 	"Execute the receiver.
 	AWS commands sometimes truncate the output, resulting in a STON parsing error.  Retry in these cases."
-	| retryDelay |
+	| retryDelay awsClients |
 
 	retryDelay := 1.
+	awsClients := #().
 	^ [ self execute ]
 		on: STONReaderError
 		do: [ :ex |
+			awsClients := awsClients copyWith: awsClient -> ex.
 			retryCount := retryCount - 1.
 			retryCount > 0 ifTrue: 
 				[ retryDelay <= 16 ifTrue:
 					[ retryDelay := retryDelay * 2 ].
 				retryDelay seconds wait. 
-				self executeWithStonRetry ]
+				ex retry ]
 			ifFalse: 
 				[ ex pass ] ].
 ]

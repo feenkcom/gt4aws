@@ -6,12 +6,13 @@ Class {
 		'awsExecutable',
 		'retryCount',
 		'defaultRegion',
-		'defaultProfile'
+		'defaultProfile',
+		'process'
 	],
 	#classVars : [
 		'AwsExecutable'
 	],
-	#category : #'Gt4Aws-Client'
+	#category : 'Gt4Aws-Client'
 }
 
 { #category : #accessing }
@@ -107,6 +108,11 @@ GtAwsClient >> initialize [
 ]
 
 { #category : #accessing }
+GtAwsClient >> process [
+	^process
+]
+
+{ #category : #accessing }
 GtAwsClient >> retryCount [
 	^ retryCount
 ]
@@ -123,26 +129,26 @@ GtAwsClient >> run: arguments [
 
 { #category : #api }
 GtAwsClient >> runArguments: anArray returnBlock: aBlockOrNil [
-	| proc exception |
+	| exception |
 
-	proc := GtSubprocessWithInMemoryOutput command: self awsExecutable
+	process := GtSubprocessWithInMemoryOutput command: self awsExecutable
 				arguments: anArray asAwsCli.
-	proc
+	process
 		retryCount: retryCount;
 		addAllEnvVariablesFromParentWithoutOverride;
 		errorBlock: 
-				[exception := proc pollException.
+				[exception := process pollException.
 				exception ifNotNil: [exception freeze]].
 	self defaultRegion
-		ifNotNil: [:aRegion | proc environmentAt: 'AWS_REGION' put: aRegion].
+		ifNotNil: [:aRegion | process environmentAt: 'AWS_REGION' put: aRegion].
 	self defaultProfile
-		ifNotNil: [:aProfile | proc environmentAt: 'AWS_PROFILE' put: aProfile].
+		ifNotNil: [:aProfile | process environmentAt: 'AWS_PROFILE' put: aProfile].
 	monitor critical: 
 			[self emitAwsCommandStartedSignalWithArguments: anArray.
-			[proc runAndWait]
+			[process runAndWait]
 				ensure: [self emitAwsCommandEndedSignalWithArguments: anArray]].
 	exception ifNotNil: [self error: 'Exception while running command'].
-	proc isSuccess ifFalse:
-		[ self error: 'aws call completed unsuccessfully:', String cr, proc stderr asString ].
-	^(aBlockOrNil ifNil: [[:p | p]]) value: proc
+	process isSuccess ifFalse:
+		[ self error: 'aws call completed unsuccessfully:', String cr, process stderr asString ].
+	^(aBlockOrNil ifNil: [[:p | p]]) value: process
 ]

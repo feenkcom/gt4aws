@@ -1,7 +1,7 @@
 Class {
 	#name : #GtAwsIAMRoleGroup,
 	#superclass : #GtAwsGroup,
-	#category : #'Gt4Aws-Model'
+	#category : 'Gt4Aws-Model'
 }
 
 { #category : #'as yet unclassified' }

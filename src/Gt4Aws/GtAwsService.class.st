@@ -10,7 +10,7 @@ Class {
 		'profile',
 		'zone'
 	],
-	#category : #'Gt4Aws-Importer'
+	#category : 'Gt4Aws-Importer'
 }
 
 { #category : #accessing }

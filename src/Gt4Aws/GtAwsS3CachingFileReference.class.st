@@ -6,7 +6,7 @@ Class {
 		'size',
 		'modificationTime'
 	],
-	#category : #'Gt4Aws-Model'
+	#category : 'Gt4Aws-Model'
 }
 
 { #category : #converting }
