@@ -121,33 +121,28 @@ GtAwsClient >> run: arguments [
 	^ self runArguments: arguments returnBlock: #stdout
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #api }
 GtAwsClient >> runArguments: anArray returnBlock: aBlockOrNil [
-	| builder output status |
+	| proc exception |
 
-	builder := GtExternalProcessBuilder new
-		command: self awsExecutable;
-		arguments: anArray asAwsCli;
+	proc := GtSubprocessWithInMemoryOutput command: self awsExecutable
+				arguments: anArray asAwsCli.
+	proc
+		retryCount: retryCount;
 		addAllEnvVariablesFromParentWithoutOverride;
-		pipeStderr;
-		pipeStdout.
-
+		errorBlock: 
+				[exception := proc pollException.
+				exception ifNotNil: [exception freeze]].
 	self defaultRegion
-		ifNotNil: [ :aRegion | builder env: 'AWS_REGION' value: aRegion ].
-
+		ifNotNil: [:aRegion | proc environmentAt: 'AWS_REGION' put: aRegion].
 	self defaultProfile
-		ifNotNil: [ :aProfile | builder env: 'AWS_PROFILE' value: aProfile ].
-
+		ifNotNil: [:aProfile | proc environmentAt: 'AWS_PROFILE' put: aProfile].
 	monitor critical: 
-		[ self emitAwsCommandStartedSignalWithArguments: anArray.
-		[ output := builder asyncOutput wait. ] 
-			ensure: [ self emitAwsCommandEndedSignalWithArguments: anArray ] ].
-
-	status := output status.
-	status isSuccess ifFalse: 
-		[ | message |
-		message := output stderr trimBoth ifEmpty:
-			[ 'Exception while running command' ].
-		self error: message ].
-	^ (aBlockOrNil ifNil: [ [ :p | p ] ]) value: output
+			[self emitAwsCommandStartedSignalWithArguments: anArray.
+			[proc runAndWait]
+				ensure: [self emitAwsCommandEndedSignalWithArguments: anArray]].
+	exception ifNotNil: [self error: 'Exception while running command'].
+	proc isSuccess ifFalse:
+		[ self error: 'aws call completed unsuccessfully:', String cr, proc stderr asString ].
+	^(aBlockOrNil ifNil: [[:p | p]]) value: proc
 ]
