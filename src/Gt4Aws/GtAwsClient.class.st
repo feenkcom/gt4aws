@@ -12,7 +12,7 @@ Class {
 	#classVars : [
 		'AwsExecutable'
 	],
-	#category : 'Gt4Aws-Client'
+	#category : #'Gt4Aws-Client'
 }
 
 { #category : #accessing }
@@ -149,6 +149,6 @@ GtAwsClient >> runArguments: anArray returnBlock: aBlockOrNil [
 				ensure: [self emitAwsCommandEndedSignalWithArguments: anArray]].
 	exception ifNotNil: [self error: 'Exception while running command'].
 	process isSuccess ifFalse:
-		[ self error: 'aws call completed unsuccessfully:', String cr, process stderr asString ].
+		[ GtSubprocessError new process: process ].
 	^(aBlockOrNil ifNil: [[:p | p]]) value: process
 ]

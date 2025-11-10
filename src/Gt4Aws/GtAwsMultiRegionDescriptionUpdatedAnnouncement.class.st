@@ -4,7 +4,7 @@ Class {
 	#instVars : [
 		'manager'
 	],
-	#category : 'Gt4Aws-Management'
+	#category : #'Gt4Aws-Management'
 }
 
 { #category : #accessing }

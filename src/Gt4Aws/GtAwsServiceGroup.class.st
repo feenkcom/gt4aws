@@ -1,7 +1,7 @@
 Class {
 	#name : #GtAwsServiceGroup,
 	#superclass : #GtAwsGroup,
-	#category : 'Gt4Aws-Model'
+	#category : #'Gt4Aws-Model'
 }
 
 { #category : #accessing }

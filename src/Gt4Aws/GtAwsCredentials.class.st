@@ -6,7 +6,7 @@ Class {
 		'accessKeyId',
 		'secretAccessKey'
 	],
-	#category : 'Gt4Aws-Credentials'
+	#category : #'Gt4Aws-Credentials'
 }
 
 { #category : #accessing }

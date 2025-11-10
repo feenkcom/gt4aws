@@ -6,7 +6,7 @@ Class {
 		'client',
 		'pipeline'
 	],
-	#category : 'Gt4Aws-Model'
+	#category : #'Gt4Aws-Model'
 }
 
 { #category : #accessing }
