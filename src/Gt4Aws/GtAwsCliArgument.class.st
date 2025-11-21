@@ -5,7 +5,7 @@ Class {
 		'key',
 		'value'
 	],
-	#category : #'Gt4Aws-Executor'
+	#category : 'Gt4Aws-Executor'
 }
 
 { #category : #'instance creation' }

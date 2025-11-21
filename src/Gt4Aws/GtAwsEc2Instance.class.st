@@ -7,7 +7,7 @@ Class {
 		'launchTime',
 		'cpuUsage'
 	],
-	#category : #'Gt4Aws-Model'
+	#category : 'Gt4Aws-Model'
 }
 
 { #category : #accessing }

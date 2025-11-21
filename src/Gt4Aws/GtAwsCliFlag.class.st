@@ -4,7 +4,7 @@ Class {
 	#instVars : [
 		'name'
 	],
-	#category : #'Gt4Aws-Executor'
+	#category : 'Gt4Aws-Executor'
 }
 
 { #category : #converting }
