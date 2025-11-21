@@ -149,6 +149,9 @@ GtAwsClient >> runArguments: anArray returnBlock: aBlockOrNil [
 				ensure: [self emitAwsCommandEndedSignalWithArguments: anArray]].
 	exception ifNotNil: [self error: 'Exception while running command'].
 	process isSuccess ifFalse:
-		[ GtSubprocessError new process: process ].
+		[ GtSubprocessError new
+			messageText: 'aws call completed unsuccessfully';
+			process: process;
+			signal ].
 	^(aBlockOrNil ifNil: [[:p | p]]) value: process
 ]
