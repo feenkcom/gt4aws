@@ -4,7 +4,7 @@ Class {
 	#instVars : [
 		'groupName'
 	],
-	#category : 'Gt4Aws-Model'
+	#category : #'Gt4Aws-Model'
 }
 
 { #category : #lejsonv4 }

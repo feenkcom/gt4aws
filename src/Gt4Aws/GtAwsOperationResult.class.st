@@ -8,7 +8,7 @@ Class {
 		'key',
 		'documentation'
 	],
-	#category : 'Gt4Aws-Executor'
+	#category : #'Gt4Aws-Executor'
 }
 
 { #category : #accessing }

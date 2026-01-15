@@ -6,7 +6,7 @@ Class {
 		'attributes',
 		'tags'
 	],
-	#category : 'Gt4Aws-Model'
+	#category : #'Gt4Aws-Model'
 }
 
 { #category : #accessing }

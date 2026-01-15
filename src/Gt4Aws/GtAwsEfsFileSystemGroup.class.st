@@ -1,5 +1,5 @@
 Class {
 	#name : #GtAwsEfsFileSystemGroup,
 	#superclass : #GtAwsGroup,
-	#category : 'Gt4Aws-Model'
+	#category : #'Gt4Aws-Model'
 }

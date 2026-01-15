@@ -5,7 +5,7 @@ Class {
 		'content',
 		'operation'
 	],
-	#category : 'Gt4Aws-Client'
+	#category : #'Gt4Aws-Client'
 }
 
 { #category : #accessing }

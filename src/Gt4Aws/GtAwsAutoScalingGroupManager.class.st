@@ -13,7 +13,7 @@ Class {
 		'DescriptionCaches',
 		'DescriptionMutex'
 	],
-	#category : 'Gt4Aws-Management'
+	#category : #'Gt4Aws-Management'
 }
 
 { #category : #accessing }
@@ -77,6 +77,13 @@ GtAwsAutoScalingGroupManager >> descriptionState [
 ]
 
 { #category : #accessing }
+GtAwsAutoScalingGroupManager >> descriptionWaitTime [
+	"Answer the number of seconds to wait for the receiver's description to be retrieved"
+
+	^ 20
+]
+
+{ #category : #accessing }
 GtAwsAutoScalingGroupManager >> groupName [
 	^groupName
 ]
@@ -126,19 +133,6 @@ GtAwsAutoScalingGroupManager >> regionName: anObject [
 { #category : #accessing }
 GtAwsAutoScalingGroupManager >> waitForDescription [
 	"Answer the receiver's description, waiting if it isn't yet available."
-	| maxRetries retryCount delay description |
 
-	descriptionCache isStale ifTrue:
-		[ maxRetries := 9.
-		delay := 1 second.
-		retryCount := 0.
-
-		descriptionCache keepAlive.
-		[ descriptionCache isStale and: [ retryCount <= maxRetries ]. ] whileTrue:
-			[ retryCount := retryCount + 1.
-			delay wait. ] ].
-	description := self description.
-	description ifNil:
-		[ self error: 'Unable to retrieve description' ].
-	^ description
+	^ self descriptionCache waitForValue: self descriptionWaitTime.
 ]

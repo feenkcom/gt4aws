@@ -1,7 +1,7 @@
 Class {
 	#name : #GtAWSCodePipeline,
 	#superclass : #GtAwsEntityHolder,
-	#category : 'Gt4Aws-Model'
+	#category : #'Gt4Aws-Model'
 }
 
 { #category : #'as yet unclassified' }

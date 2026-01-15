@@ -1,7 +1,7 @@
 Class {
 	#name : #GtAwsCliExecutor,
 	#superclass : #GtAwsOperationExecutor,
-	#category : 'Gt4Aws-Executor'
+	#category : #'Gt4Aws-Executor'
 }
 
 { #category : #accessing }

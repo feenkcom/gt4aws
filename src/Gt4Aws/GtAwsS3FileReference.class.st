@@ -1,7 +1,7 @@
 Class {
 	#name : #GtAwsS3FileReference,
 	#superclass : #GtAwsS3AbstractFileReference,
-	#category : 'Gt4Aws-Model'
+	#category : #'Gt4Aws-Model'
 }
 
 { #category : #accessing }
