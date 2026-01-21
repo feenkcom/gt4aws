@@ -12,7 +12,7 @@ Class {
 	#classVars : [
 		'AwsExecutable'
 	],
-	#category : #'Gt4Aws-Client'
+	#category : 'Gt4Aws-Client'
 }
 
 { #category : #accessing }

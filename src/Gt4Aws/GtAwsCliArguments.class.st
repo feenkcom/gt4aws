@@ -7,7 +7,7 @@ Class {
 		'operation',
 		'endpointPrefix'
 	],
-	#category : #'Gt4Aws-Executor'
+	#category : 'Gt4Aws-Executor'
 }
 
 { #category : #'as yet unclassified' }

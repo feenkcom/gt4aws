@@ -6,12 +6,17 @@ Class {
 		'retryCount',
 		'executableName'
 	],
-	#category : #'Gt4Aws-Logging'
+	#category : 'Gt4Aws-Logging'
 }
 
 { #category : #accessing }
 GtAwsWebServiceCommandSignal class >> eventType [
 	^ GtAwsWebServiceCommandEvent
+]
+
+{ #category : #accessing }
+GtAwsWebServiceCommandSignal >> arguments [
+	^arguments
 ]
 
 { #category : #accessing }
@@ -35,6 +40,11 @@ GtAwsWebServiceCommandSignal >> commandString [
 				aStream 
 					<< ' ';
 					<< arg asString ] ] ]
+]
+
+{ #category : #accessing }
+GtAwsWebServiceCommandSignal >> executableName [
+	^executableName
 ]
 
 { #category : #accessing }
@@ -94,6 +104,11 @@ GtAwsWebServiceCommandSignal >> printOneLineContentsOn: stream [
 		nextPutAll: arguments storeString;
 		<< ' | ';
 		nextPutAll: self processId asString
+]
+
+{ #category : #accessing }
+GtAwsWebServiceCommandSignal >> retryCount [
+	^retryCount
 ]
 
 { #category : #accessing }

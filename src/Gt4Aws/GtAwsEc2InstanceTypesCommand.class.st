@@ -1,7 +1,7 @@
 Class {
 	#name : #GtAwsEc2InstanceTypesCommand,
 	#superclass : #GtAwsEc2Command,
-	#category : #'Gt4Aws-Commands'
+	#category : 'Gt4Aws-Commands'
 }
 
 { #category : #initialization }

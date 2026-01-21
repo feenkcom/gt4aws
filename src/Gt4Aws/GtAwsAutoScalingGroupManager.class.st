@@ -13,7 +13,7 @@ Class {
 		'DescriptionCaches',
 		'DescriptionMutex'
 	],
-	#category : #'Gt4Aws-Management'
+	#category : 'Gt4Aws-Management'
 }
 
 { #category : #accessing }

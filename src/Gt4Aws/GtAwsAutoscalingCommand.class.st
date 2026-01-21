@@ -4,7 +4,7 @@ Class {
 	#instVars : [
 		'groupName'
 	],
-	#category : #'Gt4Aws-Commands'
+	#category : 'Gt4Aws-Commands'
 }
 
 { #category : #accessing }
