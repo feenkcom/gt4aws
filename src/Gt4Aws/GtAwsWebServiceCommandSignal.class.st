@@ -15,6 +15,11 @@ GtAwsWebServiceCommandSignal class >> eventType [
 ]
 
 { #category : #accessing }
+GtAwsWebServiceCommandSignal >> arguments [
+	^arguments
+]
+
+{ #category : #accessing }
 GtAwsWebServiceCommandSignal >> arguments: anArray [ 
 	arguments := anArray
 ]
@@ -35,6 +40,11 @@ GtAwsWebServiceCommandSignal >> commandString [
 				aStream 
 					<< ' ';
 					<< arg asString ] ] ]
+]
+
+{ #category : #accessing }
+GtAwsWebServiceCommandSignal >> executableName [
+	^executableName
 ]
 
 { #category : #accessing }
@@ -94,6 +104,11 @@ GtAwsWebServiceCommandSignal >> printOneLineContentsOn: stream [
 		nextPutAll: arguments storeString;
 		<< ' | ';
 		nextPutAll: self processId asString
+]
+
+{ #category : #accessing }
+GtAwsWebServiceCommandSignal >> retryCount [
+	^retryCount
 ]
 
 { #category : #accessing }
