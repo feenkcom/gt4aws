@@ -4,7 +4,7 @@ Class {
 	#instVars : [
 		'key'
 	],
-	#category : 'Gt4Aws-Commands'
+	#category : #'Gt4Aws-Commands'
 }
 
 { #category : #initialization }

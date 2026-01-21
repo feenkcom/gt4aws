@@ -7,7 +7,7 @@ Class {
 		'argumentsArray',
 		'profile'
 	],
-	#category : 'Gt4Aws-Executor'
+	#category : #'Gt4Aws-Executor'
 }
 
 { #category : #accessing }

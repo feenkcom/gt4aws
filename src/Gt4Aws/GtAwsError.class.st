@@ -4,7 +4,7 @@ Class {
 	#instVars : [
 		'response'
 	],
-	#category : 'Gt4Aws-Client'
+	#category : #'Gt4Aws-Client'
 }
 
 { #category : #accessing }

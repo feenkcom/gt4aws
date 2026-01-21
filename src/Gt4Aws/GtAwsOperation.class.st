@@ -7,7 +7,7 @@ Class {
 		'input',
 		'output'
 	],
-	#category : 'Gt4Aws-Importer'
+	#category : #'Gt4Aws-Importer'
 }
 
 { #category : #'as yet unclassified' }

@@ -1,5 +1,5 @@
 Class {
 	#name : #GtAwsInstanceTypeExamples,
 	#superclass : #Object,
-	#category : 'Gt4Aws-Examples'
+	#category : #'Gt4Aws-Examples'
 }
