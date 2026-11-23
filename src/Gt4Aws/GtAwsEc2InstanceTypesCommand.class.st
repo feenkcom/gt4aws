@@ -17,9 +17,9 @@ GtAwsEc2InstanceTypesCommand >> process: aString [
 
 	typesArray := STONJSON fromString: aString trimBoth.
 	result := Dictionary new.
-	(typesArray  at: #InstanceTypes) do: [ :each | 
+	(typesArray  at: 'InstanceTypes') do: [ :each | 
 		result
-			at: (each at: #InstanceType)
+			at: (each at: 'InstanceType')
 			put: (GtAwsInstanceType jsonObject: each) ].
 	^ result
 ]

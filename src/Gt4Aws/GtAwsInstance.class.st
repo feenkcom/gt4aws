@@ -7,7 +7,7 @@ Class {
 { #category : #accessing }
 GtAwsInstance >> availabilityZone [
 
-	^ jsonObject at: #AvailabilityZone
+	^ jsonObject at: 'AvailabilityZone'
 ]
 
 { #category : #accessing }
@@ -25,7 +25,7 @@ GtAwsInstance >> description [
 		ec2Command: 'describe-instances' 
 		instanceId: self instanceId 
 		notification: nil).
-	wrapper := wrapper at: #Reservations.
+	wrapper := wrapper at: 'Reservations'.
 	self assert: wrapper size equals: 1.
 	^ GtAwsInstanceDescription jsonObject: wrapper first.
 ]
@@ -33,25 +33,25 @@ GtAwsInstance >> description [
 { #category : #accessing }
 GtAwsInstance >> healthStatus [
 
-	^ jsonObject at: #HealthStatus
+	^ jsonObject at: 'HealthStatus'
 ]
 
 { #category : #accessing }
 GtAwsInstance >> instanceId [
 
-	^ jsonObject at: #InstanceId
+	^ jsonObject at: 'InstanceId'
 ]
 
 { #category : #accessing }
 GtAwsInstance >> instanceType [
 
-	^ jsonObject at: #InstanceType
+	^ jsonObject at: 'InstanceType'
 ]
 
 { #category : #testing }
 GtAwsInstance >> isInService [
 
-	^ self lifecycleState = #InService
+	^ self lifecycleState = 'InService'
 ]
 
 { #category : #testing }
@@ -63,7 +63,7 @@ GtAwsInstance >> isTerminating [
 { #category : #accessing }
 GtAwsInstance >> lifecycleState [
 
-	^ jsonObject at: #LifecycleState
+	^ jsonObject at: 'LifecycleState'
 ]
 
 { #category : #printing }
@@ -76,11 +76,11 @@ GtAwsInstance >> printOn: aStream [
 { #category : #accessing }
 GtAwsInstance >> protectedFromScaleIn [
 
-	^ jsonObject at: #ProtectedFromScaleIn
+	^ jsonObject at: 'ProtectedFromScaleIn'
 ]
 
 { #category : #accessing }
 GtAwsInstance >> weightedCapacity [
 
-	^ (jsonObject at: #WeightedCapacity) asNumber
+	^ (jsonObject at: 'WeightedCapacity') asNumber
 ]

@@ -33,7 +33,7 @@ GtAwsAutoScalingGroupDescription >> activeCoreCount [
 { #category : #accessing }
 GtAwsAutoScalingGroupDescription >> arn [
 
-	^ jsonObject at: #AutoScalingGroupARN.
+	^ jsonObject at: 'AutoScalingGroupARN'.
 ]
 
 { #category : #accessing }
@@ -75,7 +75,7 @@ GtAwsAutoScalingGroupDescription >> coreCountTerminating [
 { #category : #accessing }
 GtAwsAutoScalingGroupDescription >> desiredCapacity [
 
-	^ jsonObject at: #DesiredCapacity.
+	^ jsonObject at: 'DesiredCapacity'.
 ]
 
 { #category : #'as yet unclassified' }
@@ -93,14 +93,14 @@ GtAwsAutoScalingGroupDescription >> groupName: anObject [
 GtAwsAutoScalingGroupDescription >> instanceCount [
 	"Answer the number of instances returned in the description."
 	
-	^ (jsonObject at: #Instances) size
+	^ (jsonObject at: 'Instances') size
 ]
 
 { #category : #accessing }
 GtAwsAutoScalingGroupDescription >> instances [
 	"Answer the instances currently running in the ASG."
 
-	^ (jsonObject at: #Instances) collect: [ :each |
+	^ (jsonObject at: 'Instances') collect: [ :each |
 		GtAwsInstance jsonObject: each ].
 ]
 
@@ -135,34 +135,34 @@ GtAwsAutoScalingGroupDescription >> launchTemplateOverrides [
 { #category : #accessing }
 GtAwsAutoScalingGroupDescription >> maxCapacity [
 
-	^ jsonObject at: #MaxSize
+	^ jsonObject at: 'MaxSize'
 ]
 
 { #category : #accessing }
 GtAwsAutoScalingGroupDescription >> minCapacity [
 
-	^ jsonObject at: #MinSize
+	^ jsonObject at: 'MinSize'
 ]
 
 { #category : #accessing }
 GtAwsAutoScalingGroupDescription >> preTerminatingCount [
 	"Answer the number of instances that are either starting or running."
 
-	^ ((jsonObject at: #Instances) reject: [ :each | 
-		(each at: #LifecycleState) beginsWith: 'Terminat' ]) size.
+	^ ((jsonObject at: 'Instances') reject: [ :each | 
+		(each at: 'LifecycleState') beginsWith: 'Terminat' ]) size.
 ]
 
 { #category : #accessing }
 GtAwsAutoScalingGroupDescription >> preTerminatingInstances [
 	"Answer the instances currently running in the ASG."
 
-	^ (jsonObject at: #Instances) 
+	^ (jsonObject at: 'Instances') 
 		reject: [ :each | 
 			"Terminating lifecycle states: 
 				Terminating:Wait
 				Terminating:Proceed
 				Terminated?"
-			(each at: #LifecycleState) beginsWith: 'Terminat' ]
+			(each at: 'LifecycleState') beginsWith: 'Terminat' ]
 		thenCollect: [ :each |
 			GtAwsInstance jsonObject: each ].
 ]

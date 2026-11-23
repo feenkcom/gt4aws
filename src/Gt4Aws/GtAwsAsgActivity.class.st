@@ -7,59 +7,59 @@ Class {
 { #category : #accessing }
 GtAwsAsgActivity >> activityId [
 
-	^ jsonObject at: #ActivityId
+	^ jsonObject at: 'ActivityId'
 ]
 
 { #category : #accessing }
 GtAwsAsgActivity >> autoScalingGroupArn [
 
-	^ jsonObject at: #AutoScalingGroupARN
+	^ jsonObject at: 'AutoScalingGroupARN'
 ]
 
 { #category : #accessing }
 GtAwsAsgActivity >> autoScalingGroupName [
 
-	^ jsonObject at: #AutoScalingGroupName
+	^ jsonObject at: 'AutoScalingGroupName'
 ]
 
 { #category : #accessing }
 GtAwsAsgActivity >> cause [
 
-	^ jsonObject at: #Cause
+	^ jsonObject at: 'Cause'
 ]
 
 { #category : #accessing }
 GtAwsAsgActivity >> description [
 
-	^ jsonObject at: #Description
+	^ jsonObject at: 'Description'
 ]
 
 { #category : #accessing }
 GtAwsAsgActivity >> details [
 
-	^ jsonObject at: #Details
+	^ jsonObject at: 'Details'
 ]
 
 { #category : #accessing }
 GtAwsAsgActivity >> endTime [
 
-	^ DateAndTime readFrom: (jsonObject at: #EndTime) readStream
+	^ DateAndTime readFrom: (jsonObject at: 'EndTime') readStream
 ]
 
 { #category : #accessing }
 GtAwsAsgActivity >> progress [
 
-	^ jsonObject at: #Progress
+	^ jsonObject at: 'Progress'
 ]
 
 { #category : #accessing }
 GtAwsAsgActivity >> startTime [
 
-	^ DateAndTime readFrom: (jsonObject at: #StartTime) readStream
+	^ DateAndTime readFrom: (jsonObject at: 'StartTime') readStream
 ]
 
 { #category : #accessing }
 GtAwsAsgActivity >> statusCode [
 
-	^ jsonObject at: #StatusCode
+	^ jsonObject at: 'StatusCode'
 ]
