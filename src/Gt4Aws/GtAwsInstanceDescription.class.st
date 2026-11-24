@@ -7,29 +7,29 @@ Class {
 { #category : #accessing }
 GtAwsInstanceDescription >> coreCount [
 
-	^ self cpuOptions at: #CoreCount
+	^ self cpuOptions at: 'CoreCount'
 ]
 
 { #category : #private }
 GtAwsInstanceDescription >> coreDictionary [
 
-	^ (jsonObject at: #Instances) first
+	^ (jsonObject at: 'Instances') first
 ]
 
 { #category : #accessing }
 GtAwsInstanceDescription >> cpuOptions [
 
-	^ self coreDictionary at: #CpuOptions
+	^ self coreDictionary at: 'CpuOptions'
 ]
 
 { #category : #accessing }
 GtAwsInstanceDescription >> instanceId [
 
-	^ self coreDictionary at: #InstanceId
+	^ self coreDictionary at: 'InstanceId'
 ]
 
 { #category : #accessing }
 GtAwsInstanceDescription >> privateIpAddress [
 
-	^ self coreDictionary at: #PrivateIpAddress.
+	^ self coreDictionary at: 'PrivateIpAddress'.
 ]

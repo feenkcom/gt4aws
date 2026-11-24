@@ -34,5 +34,5 @@ GtAwsInstanceType >> totalMemory [
 { #category : #'as yet unclassified' }
 GtAwsInstanceType >> vCpuCount [
 
-	^ (jsonObject at: #VCpuInfo) at: #DefaultVCpus
+	^ (jsonObject at: 'VCpuInfo') at: 'DefaultVCpus'
 ]
